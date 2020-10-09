@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SPMAssetExporter",
+        "repositoryURL": "https://github.com/SergeyPetrachkov/SPMAssetExporter",
+        "state": {
+          "branch": null,
+          "revision": "85b5946924093ddd88dffa52f6f29b76636736b1",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
