@@ -11,41 +11,84 @@ import AVKit
 import Photos
 import SPMAssetExporter
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
+  // MARK: - Essentials
+  private let lockQueue = DispatchQueue(label: "locking.queue", attributes: .concurrent)
 
-  let editor = ClipMaker()
+  private var videoUrls: [URL] = []
 
+  private let editor = ClipMaker()
+
+  // MARK: - UI
   var player: AVPlayer?
   var layer: AVPlayerLayer?
   lazy var videoView: UIView = UIView(frame: .init(origin: .zero, size: .init(width: self.view.bounds.width, height: self.view.bounds.width * 0.667)))
 
+  // MARK: - Life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    let filePath = Bundle.main.path(forResource: "0EjMgqLc1qNtiEA5Wh7qNqXT46RBGW", ofType: "mp4")!
     self.videoView.center = self.view.center
     self.view.addSubview(videoView)
-//    let player = AVPlayer(url: url)
-//    let playerLayer = AVPlayerLayer(player: player)
-//    self.player = player
-//    self.layer = playerLayer
-//    playerLayer.frame = videoView.bounds
-//    videoView.layer.addSublayer(playerLayer)
-//    player.play()
+    let dispatchGroup = DispatchGroup()
 
+    DispatchQueue.global().async {
+
+      dispatchGroup.enter()
+      let filePath = Bundle.main.path(forResource: "9010D842-CB8B-4C21-B2E3-2254D6209DEA", ofType: "MP4")!
+      let url = URL(fileURLWithPath: filePath)
+      self.editor.decorateVideoWithEffects(videoURL: url, addingText: "Pushups") { [weak self] result in
+        guard let self = self else {
+          return
+        }
+        _ = result.map { videoUrl in
+          self.lockQueue.async(flags: .barrier) {
+            self.videoUrls.append(videoUrl)
+            dispatchGroup.leave()
+          }
+        }
+      }
+
+      dispatchGroup.enter()
+      let filePath2 = Bundle.main.path(forResource: "0EjMgqLc1qNtiEA5Wh7qNqXT46RBGW", ofType: "mp4")!
+      let url2 = URL(fileURLWithPath: filePath2)
+      self.editor.decorateVideoWithEffects(videoURL: url2, addingText: "Check check") { [weak self] result in
+        guard let self = self else {
+          return
+        }
+        _ = result.map { videoUrl in
+          self.lockQueue.async(flags: .barrier) {
+            self.videoUrls.append(videoUrl)
+            dispatchGroup.leave()
+          }
+        }
+      }
+
+      dispatchGroup.wait()
+
+      self.editor.mergeVideos(urls: self.videoUrls) { result in
+        switch result {
+        case .success(let exportedURL):
+          self.showVideo(url: exportedURL)
+        case .failure(let error):
+          print(error)
+        }
+      }
+    }
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-//    /Users/sergey/Downloads/New Folder With Items/9010D842-CB8B-4C21-B2E3-2254D6209DEA.MP4
-//    let filePath = Bundle.main.path(forResource: "0EjMgqLc1qNtiEA5Wh7qNqXT46RBGW", ofType: "mp4")!
-    let filePath = Bundle.main.path(forResource: "9010D842-CB8B-4C21-B2E3-2254D6209DEA", ofType: "MP4")!
-//    "/Users/sergey/Downloads/New Folder With Items/9010D842-CB8B-4C21-B2E3-2254D6209DEA.MP4"
-//    let ch = URL(string: "/Users/sergey/Downloads/New Folder With Items/9010D842-CB8B-4C21-B2E3-2254D6209DEA.MP4")
-    let url = URL(fileURLWithPath: filePath)
-    self.generate(url: url, name: "Push-ups")
-//    self.pickVideo(from: .photoLibrary)
+  private func showVideo(url: URL) {
+    self.layer?.removeFromSuperlayer()
+    self.player = nil
+    let player = AVPlayer(url: url)
+    let playerLayer = AVPlayerLayer(player: player)
+    self.player = player
+    self.layer = playerLayer
+    playerLayer.frame = self.videoView.bounds
+    self.videoView.layer.addSublayer(playerLayer)
+    player.play()
   }
-  func generate(url: URL, name: String) {
+
+  private func generate(url: URL, name: String) {
     self.editor.decorateVideoWithEffects(videoURL: url, addingText: name) { [weak self] result in
 
       guard let self = self else {
@@ -65,51 +108,6 @@ class ViewController: UIViewController {
       case .failure(let error):
         print(error)
       }
-    }
-  }
-  private func pickVideo(from sourceType: UIImagePickerController.SourceType) {
-    let pickerController = UIImagePickerController()
-    pickerController.sourceType = sourceType
-    pickerController.mediaTypes = [kUTTypeMovie as String]
-    pickerController.videoQuality = .typeIFrame1280x720
-    if sourceType == .camera {
-      pickerController.cameraDevice = .front
-    }
-    pickerController.delegate = self
-    present(pickerController, animated: true)
-  }
-
-  private func showVideo(at url: URL) {
-    let player = AVPlayer(url: url)
-    let playerViewController = AVPlayerViewController()
-    playerViewController.player = player
-    present(playerViewController, animated: true) {
-      player.play()
-    }
-  }
-
-  private var pickedURL: URL?
-}
-
-extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-    guard
-      let url = info[.mediaURL] as? URL
-    else {
-      print("Cannot get video URL")
-      return
-    }
-
-    picker.dismiss(animated: true) {
-      self.generate(url: url, name: "Testing label")
-//      self.editor.makeBirthdayCard(fromVideoAt: url, forName: name) { exportedURL in
-//        self.showCompleted()
-//        guard let exportedURL = exportedURL else {
-//          return
-//        }
-//        self.pickedURL = exportedURL
-//
-//      }
     }
   }
 }
