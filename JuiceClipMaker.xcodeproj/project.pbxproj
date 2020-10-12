@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,7 +15,6 @@
 		A5AAB06E2530654B00FC164D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06C2530654B00FC164D /* Main.storyboard */; };
 		A5AAB0702530654D00FC164D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06F2530654D00FC164D /* Assets.xcassets */; };
 		A5AAB0732530654D00FC164D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB0712530654D00FC164D /* LaunchScreen.storyboard */; };
-		A5AAB0862530839C00FC164D /* SPMAssetExporter in Frameworks */ = {isa = PBXBuildFile; productRef = A5AAB0852530839C00FC164D /* SPMAssetExporter */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,7 +35,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A5AAB0862530839C00FC164D /* SPMAssetExporter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +98,6 @@
 			);
 			name = JuiceClipMaker;
 			packageProductDependencies = (
-				A5AAB0852530839C00FC164D /* SPMAssetExporter */,
 			);
 			productName = JuiceClipMaker;
 			productReference = A5AAB0632530654B00FC164D /* JuiceClipMaker.app */;
@@ -130,7 +127,6 @@
 			);
 			mainGroup = A5AAB05A2530654B00FC164D;
 			packageReferences = (
-				A5AAB0842530839C00FC164D /* XCRemoteSwiftPackageReference "SPMAssetExporter" */,
 			);
 			productRefGroup = A5AAB0642530654B00FC164D /* Products */;
 			projectDirPath = "";
@@ -367,25 +363,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		A5AAB0842530839C00FC164D /* XCRemoteSwiftPackageReference "SPMAssetExporter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SergeyPetrachkov/SPMAssetExporter";
-			requirement = {
-				kind = revision;
-				revision = 85b5946924093ddd88dffa52f6f29b76636736b1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A5AAB0852530839C00FC164D /* SPMAssetExporter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A5AAB0842530839C00FC164D /* XCRemoteSwiftPackageReference "SPMAssetExporter" */;
-			productName = SPMAssetExporter;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A5AAB05B2530654B00FC164D /* Project object */;
 }

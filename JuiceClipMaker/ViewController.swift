@@ -9,7 +9,6 @@ import MobileCoreServices
 import UIKit
 import AVKit
 import Photos
-import SPMAssetExporter
 
 final class ViewController: UIViewController {
   // MARK: - Essentials
