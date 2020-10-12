@@ -13,64 +13,69 @@ import SPMAssetExporter
 
 final class ViewController: UIViewController {
   // MARK: - Essentials
-  private let lockQueue = DispatchQueue(label: "locking.queue", attributes: .concurrent)
-
-  private var videoUrls: [URL] = []
-
   private let editor = ClipMaker()
+
+  let composerQueue = DispatchQueue(label: "video.composing.queue", attributes: .concurrent)
+  let videoEditorQueue = DispatchQueue(label: "video.editor.queue", attributes: .concurrent)
 
   // MARK: - UI
   var player: AVPlayer?
   var layer: AVPlayerLayer?
-  lazy var videoView: UIView = UIView(frame: .init(origin: .zero, size: .init(width: self.view.bounds.width, height: self.view.bounds.width * 0.667)))
+  lazy var videoView: UIView = UIView(
+    frame: .init(origin: .zero,
+                 size: .init(width: self.view.bounds.width,
+                             height: self.view.bounds.width * 0.667)
+    )
+  )
+
+
+  func processVideo(at url: URL, text: String, on queue: DispatchQueue) -> URL {
+    var resultUrl: URL?
+    let dispatchGroup = DispatchGroup()
+    dispatchGroup.enter()
+    queue.async {
+      self.editor.decorateVideoWithEffects(videoURL: url, addingText: text) { result in
+        resultUrl = try? result.get()
+        dispatchGroup.leave()
+      }
+    }
+    dispatchGroup.wait()
+    return resultUrl ?? url
+  }
 
   // MARK: - Life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
     self.videoView.center = self.view.center
     self.view.addSubview(videoView)
-    let dispatchGroup = DispatchGroup()
+    let inputVideos: [URL] = [
+      "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
+      "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
+      "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
+      "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
+      "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
+    ].map { URL(string: $0) }.compactMap { $0 }
 
-    DispatchQueue.global().async {
+    self.composerQueue.async {
 
-      dispatchGroup.enter()
-      let filePath = Bundle.main.path(forResource: "9010D842-CB8B-4C21-B2E3-2254D6209DEA", ofType: "MP4")!
-      let url = URL(fileURLWithPath: filePath)
-      self.editor.decorateVideoWithEffects(videoURL: url, addingText: "Pushups") { [weak self] result in
-        guard let self = self else {
-          return
-        }
-        _ = result.map { videoUrl in
-          self.lockQueue.async(flags: .barrier) {
-            self.videoUrls.append(videoUrl)
-            dispatchGroup.leave()
-          }
-        }
-      }
+      let videos = inputVideos
+        .enumerated()
+        .map { self.processVideo(at: $0.element, text: "\($0.offset) Task", on: self.videoEditorQueue) }
 
-      dispatchGroup.enter()
-      let filePath2 = Bundle.main.path(forResource: "0EjMgqLc1qNtiEA5Wh7qNqXT46RBGW", ofType: "mp4")!
-      let url2 = URL(fileURLWithPath: filePath2)
-      self.editor.decorateVideoWithEffects(videoURL: url2, addingText: "Check check") { [weak self] result in
-        guard let self = self else {
-          return
-        }
-        _ = result.map { videoUrl in
-          self.lockQueue.async(flags: .barrier) {
-            self.videoUrls.append(videoUrl)
-            dispatchGroup.leave()
-          }
-        }
-      }
-
-      dispatchGroup.wait()
-
-      self.editor.mergeVideos(urls: self.videoUrls) { result in
+      self.editor.mergeVideos(urls: videos) { result in
         switch result {
         case .success(let exportedURL):
-          self.showVideo(url: exportedURL)
+          DispatchQueue.main.async {
+            self.showVideo(url: exportedURL)
+          }
         case .failure(let error):
           print(error)
+          DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Error!", message: error.localizedDescription, preferredStyle: .alert)
+            let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
+            alert.addAction(ok)
+            self.present(alert, animated: true, completion: nil)
+          }
         }
       }
     }
