@@ -9,6 +9,7 @@ import MobileCoreServices
 import UIKit
 import AVKit
 import Photos
+import Foundation
 
 final class ViewController: UIViewController {
   // MARK: - Essentials
@@ -42,6 +43,20 @@ final class ViewController: UIViewController {
     return resultUrl ?? url
   }
 
+  func processVideo(at url: URL, textOverlay: TextOverlayConfig, on queue: DispatchQueue) -> URL {
+    var resultUrl: URL?
+    let dispatchGroup = DispatchGroup()
+    dispatchGroup.enter()
+    queue.async {
+      self.editor.decorateVideoWithEffects(videoURL: url, textOverlay: textOverlay) { result in
+        resultUrl = try? result.get()
+        dispatchGroup.leave()
+      }
+    }
+    dispatchGroup.wait()
+    return resultUrl ?? url
+  }
+
   // MARK: - Life cycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -56,10 +71,29 @@ final class ViewController: UIViewController {
     ].map { URL(string: $0) }.compactMap { $0 }
 
     self.composerQueue.async {
+      let titleAttributes: TextOverlayConfig.TextAttributes = [
+        .font: UIFont.systemFont(ofSize: 35),
+                             .foregroundColor: UIColor.white,
+                             .strokeColor: UIColor.white,
+                             .strokeWidth: -3,
+      ]
 
+      let bodyAttributes: TextOverlayConfig.TextAttributes = [
+        .font: UIFont.systemFont(ofSize: 20),
+        .foregroundColor: UIColor.white,
+        .strokeColor: UIColor.white,
+        .strokeWidth: -3,
+      ]
       let videos = inputVideos
         .enumerated()
-        .map { self.processVideo(at: $0.element, text: "\($0.offset) Task", on: self.videoEditorQueue) }
+        .map { self.processVideo(
+          at: $0.element,
+          textOverlay: TextOverlayConfig(
+            title: .init(string: "Title \($0.offset)", attributes: titleAttributes),
+            bodyLines: [.init(string: "Body line 1", attributes: bodyAttributes),
+                        .init(string: "Body line 2", attributes: bodyAttributes)]
+          ),
+          on: self.videoEditorQueue) }
 
       self.editor.mergeVideos(urls: videos) { result in
         switch result {

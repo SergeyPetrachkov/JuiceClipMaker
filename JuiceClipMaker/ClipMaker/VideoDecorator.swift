@@ -110,4 +110,7 @@ public extension VideoCompositionManager {
 
 public protocol VideoDecorator: VideoCompositionManager {
   func decorateVideoWithEffects(videoURL: URL, addingText text: String, onComplete: @escaping (Result<URL, Error>) -> Void)
+  func decorateVideoWithEffects(videoURL: URL,
+                                textOverlay: TextOverlayConfig,
+                                onComplete: @escaping (Result<URL, Error>) -> Void)
 }

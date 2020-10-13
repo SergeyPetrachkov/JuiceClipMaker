@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A515FDDC2531CD0F00106789 /* MergeVideos.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515FDDB2531CD0F00106789 /* MergeVideos.swift */; };
+		A56136BC2535B3260037A899 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56136BB2535B3260037A899 /* TextOverlay.swift */; };
 		A570747E2531CA6100301B11 /* VideoDecorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A570747D2531CA6100301B11 /* VideoDecorator.swift */; };
 		A5827A612531B2A8004AD9B6 /* ClipMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5827A602531B2A8004AD9B6 /* ClipMaker.swift */; };
 		A5AAB0672530654B00FC164D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AAB0662530654B00FC164D /* AppDelegate.swift */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		A515FDDB2531CD0F00106789 /* MergeVideos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeVideos.swift; sourceTree = "<group>"; };
+		A56136BB2535B3260037A899 /* TextOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlay.swift; sourceTree = "<group>"; };
 		A570747D2531CA6100301B11 /* VideoDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDecorator.swift; sourceTree = "<group>"; };
 		A5827A602531B2A8004AD9B6 /* ClipMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMaker.swift; sourceTree = "<group>"; };
 		A5AAB0632530654B00FC164D /* JuiceClipMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JuiceClipMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +49,7 @@
 				A5827A602531B2A8004AD9B6 /* ClipMaker.swift */,
 				A570747D2531CA6100301B11 /* VideoDecorator.swift */,
 				A515FDDB2531CD0F00106789 /* MergeVideos.swift */,
+				A56136BB2535B3260037A899 /* TextOverlay.swift */,
 			);
 			path = ClipMaker;
 			sourceTree = "<group>";
@@ -158,6 +161,7 @@
 				A5AAB06B2530654B00FC164D /* ViewController.swift in Sources */,
 				A515FDDC2531CD0F00106789 /* MergeVideos.swift in Sources */,
 				A570747E2531CA6100301B11 /* VideoDecorator.swift in Sources */,
+				A56136BC2535B3260037A899 /* TextOverlay.swift in Sources */,
 				A5827A612531B2A8004AD9B6 /* ClipMaker.swift in Sources */,
 				A5AAB0672530654B00FC164D /* AppDelegate.swift in Sources */,
 			);
