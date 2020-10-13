@@ -327,22 +327,22 @@ class ClipMaker: VideoDecorator {
       textLayer.backgroundColor = UIColor.clear.cgColor
 
       textLayer.frame = CGRect(
-        x: -size.width,
+        x: 40,
         y: yPosition,
         width: size.width + 24,
         height: size.height
       )
       textLayer.displayIfNeeded()
 
-      let frameAnimation = CABasicAnimation(keyPath: "position.x")
-      frameAnimation.fromValue = -size.width
-      frameAnimation.toValue = size.width/2 + 40
+      let frameAnimation = CABasicAnimation(keyPath: "opacity")
+      frameAnimation.fromValue = 0
+      frameAnimation.toValue = 1
       frameAnimation.duration = 0.8
       frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
       frameAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
       frameAnimation.autoreverses = false
       frameAnimation.isRemovedOnCompletion = true
-      textLayer.position.x = size.width/2 + 40
+      textLayer.opacity = 1
 
       textLayer.add(frameAnimation, forKey: nil)
 
