@@ -301,7 +301,6 @@ class ClipMaker: VideoDecorator {
     )
     titleLayer.displayIfNeeded()
 
-
     let frameAnimation = CABasicAnimation(keyPath: "position.x")
     frameAnimation.fromValue = -titleSize.width
     frameAnimation.toValue = titleSize.width/2 + 40
@@ -309,8 +308,8 @@ class ClipMaker: VideoDecorator {
     frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
     frameAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
     frameAnimation.autoreverses = false
-    frameAnimation.isRemovedOnCompletion = true
-    titleLayer.position.x = titleSize.width/2 + 40
+    frameAnimation.isRemovedOnCompletion = false
+    frameAnimation.fillMode = .forwards
 
     titleLayer.add(frameAnimation, forKey: nil)
 
