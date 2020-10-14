@@ -79,9 +79,9 @@ final class ViewController: UIViewController {
       ]
 
       let bodyAttributes: TextOverlayConfig.TextAttributes = [
-        .font: UIFont.systemFont(ofSize: 20),
-        .foregroundColor: UIColor.white,
-        .strokeColor: UIColor.white,
+        .font: UIFont.italicSystemFont(ofSize: 20),
+        .foregroundColor: UIColor.darkGray,
+        .strokeColor: UIColor.darkGray,
         .strokeWidth: -3,
       ]
       let videos = inputVideos

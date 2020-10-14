@@ -321,15 +321,17 @@ class ClipMaker: VideoDecorator {
     zip(bodySizes, textOverlay.bodyLines).enumerated().forEach { (offset, element) in
 
       let (size, text) = element
-      yPosition -= size.height
+      yPosition -= size.height + 2
       let textLayer = CATextLayer()
       textLayer.string = text
-      textLayer.backgroundColor = UIColor.clear.cgColor
+      textLayer.backgroundColor = UIColor.white.cgColor
+      textLayer.cornerRadius = 4
+      textLayer.alignmentMode = .center
       textLayer.opacity = 0
       textLayer.frame = CGRect(
         x: 30,
         y: yPosition,
-        width: size.width + 24,
+        width: maxWidth + 24,
         height: size.height
       )
 
@@ -339,7 +341,7 @@ class ClipMaker: VideoDecorator {
       opacityAnimation.toValue = 1
       opacityAnimation.duration = animationDuration
       opacityAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-      opacityAnimation.beginTime = 0.8 + Double(offset)*animationDuration //AVCoreAnimationBeginTimeAtZero
+      opacityAnimation.beginTime = 0.8 + Double(offset)*animationDuration
       opacityAnimation.autoreverses = false
       opacityAnimation.isRemovedOnCompletion = false
       opacityAnimation.fillMode = .forwards
