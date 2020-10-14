@@ -325,26 +325,26 @@ class ClipMaker: VideoDecorator {
       let textLayer = CATextLayer()
       textLayer.string = text
       textLayer.backgroundColor = UIColor.clear.cgColor
-
+      textLayer.opacity = 0
       textLayer.frame = CGRect(
-        x: 40,
+        x: 30,
         y: yPosition,
         width: size.width + 24,
         height: size.height
       )
-      textLayer.displayIfNeeded()
 
-      let frameAnimation = CABasicAnimation(keyPath: "opacity")
-      frameAnimation.fromValue = 0
-      frameAnimation.toValue = 1
-      frameAnimation.duration = 0.8
-      frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-      frameAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
-      frameAnimation.autoreverses = false
-      frameAnimation.isRemovedOnCompletion = true
-      textLayer.opacity = 1
+      let opacityAnimation = CABasicAnimation(keyPath: "opacity")
+      let animationDuration = 0.5
+      opacityAnimation.fromValue = 0
+      opacityAnimation.toValue = 1
+      opacityAnimation.duration = animationDuration
+      opacityAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+      opacityAnimation.beginTime = 0.8 + Double(offset)*animationDuration //AVCoreAnimationBeginTimeAtZero
+      opacityAnimation.autoreverses = false
+      opacityAnimation.isRemovedOnCompletion = false
+      opacityAnimation.fillMode = .forwards
 
-      textLayer.add(frameAnimation, forKey: nil)
+      textLayer.add(opacityAnimation, forKey: nil)
 
       layer.addSublayer(textLayer)
       textLayer.setNeedsDisplay()
