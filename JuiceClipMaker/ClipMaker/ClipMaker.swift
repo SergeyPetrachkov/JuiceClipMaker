@@ -289,9 +289,66 @@ class ClipMaker: VideoDecorator {
       height: titleSize.height + bodySizes.compactMap { $0.height }.reduce (0, +)
     )
 
+    let color = UIColor(red: 85.0/255, green: 153.0/255, blue: 236.0/255, alpha: 1)
+    let titleBackgroundLayer = CALayer()
+    titleBackgroundLayer.backgroundColor = color.cgColor
+    titleBackgroundLayer.cornerRadius = 4
+    let backgroundSize = CGSize(width: titleSize.width + 24, height: titleSize.height)
+    let initialBackgroundRect = CGRect(origin: .init(x: -titleSize.width, y: overallTextSize.height), size: backgroundSize)
+    titleBackgroundLayer.frame = initialBackgroundRect
+
+    let titleBackgroundSlideAnimation = CABasicAnimation(keyPath: "position.x")
+    titleBackgroundSlideAnimation.fromValue = -titleSize.width
+    titleBackgroundSlideAnimation.toValue = titleSize.width/2 + 40
+    titleBackgroundSlideAnimation.duration = 0.8
+    titleBackgroundSlideAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+    titleBackgroundSlideAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+    titleBackgroundSlideAnimation.autoreverses = false
+    titleBackgroundSlideAnimation.isRemovedOnCompletion = false
+    titleBackgroundSlideAnimation.fillMode = .forwards
+
+    titleBackgroundLayer.add(titleBackgroundSlideAnimation, forKey: nil)
+
+    let titleBackgroundFrameAnimation = CABasicAnimation(keyPath: "bounds")
+    titleBackgroundFrameAnimation.fromValue = CGRect(origin: .zero, size: titleSize.size)
+    titleBackgroundFrameAnimation.toValue = CGRect(origin: .zero, size: CGSize(width: 10, height: titleSize.height))
+    titleBackgroundFrameAnimation.duration = 0.4
+    titleBackgroundFrameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+    titleBackgroundFrameAnimation.beginTime = 0.82
+    titleBackgroundFrameAnimation.autoreverses = false
+    titleBackgroundFrameAnimation.isRemovedOnCompletion = false
+    titleBackgroundFrameAnimation.fillMode = .forwards
+
+    let titleBackgroundRestorePositionAnimation = CABasicAnimation(keyPath: "position.x")
+    titleBackgroundRestorePositionAnimation.fromValue = titleSize.width/2 + 40
+    titleBackgroundRestorePositionAnimation.toValue = 36
+    titleBackgroundRestorePositionAnimation.duration = 0.4
+    titleBackgroundRestorePositionAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+    titleBackgroundRestorePositionAnimation.beginTime = 0.80
+    titleBackgroundRestorePositionAnimation.autoreverses = false
+    titleBackgroundRestorePositionAnimation.isRemovedOnCompletion = false
+    titleBackgroundRestorePositionAnimation.fillMode = .forwards
+
+    let group = CAAnimationGroup()
+    group.fillMode = .forwards
+    group.duration = 0.4
+    group.beginTime = 0.81
+    group.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+    group.animations = [titleBackgroundRestorePositionAnimation, titleBackgroundFrameAnimation]
+
+    titleBackgroundLayer.add(titleBackgroundSlideAnimation, forKey: nil)
+
+    titleBackgroundLayer.add(titleBackgroundFrameAnimation, forKey: nil)
+    titleBackgroundLayer.add(titleBackgroundRestorePositionAnimation, forKey: nil)
+//    titleBackgroundLayer.add(group, forKey: "frame")
+
+    layer.addSublayer(titleBackgroundLayer)
+    titleBackgroundLayer.setNeedsDisplay()
+
     let titleLayer = CATextLayer()
     titleLayer.string = textOverlay.title
     titleLayer.backgroundColor = UIColor.clear.cgColor
+    titleLayer.alignmentMode = .center
 
     titleLayer.frame = CGRect(
       x: -titleSize.width,
@@ -303,7 +360,7 @@ class ClipMaker: VideoDecorator {
 
     let frameAnimation = CABasicAnimation(keyPath: "position.x")
     frameAnimation.fromValue = -titleSize.width
-    frameAnimation.toValue = titleSize.width/2 + 40
+    frameAnimation.toValue = titleSize.width/2 + 46
     frameAnimation.duration = 0.8
     frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
     frameAnimation.beginTime = AVCoreAnimationBeginTimeAtZero

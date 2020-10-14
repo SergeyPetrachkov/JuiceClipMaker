@@ -90,8 +90,8 @@ final class ViewController: UIViewController {
           at: $0.element,
           textOverlay: TextOverlayConfig(
             title: .init(string: "Title \($0.offset)", attributes: titleAttributes),
-            bodyLines: [.init(string: "Body line 1", attributes: bodyAttributes),
-                        .init(string: "Body line 2", attributes: bodyAttributes)]
+            bodyLines: [.init(string: "Reps 10", attributes: bodyAttributes),
+                        .init(string: "Sets 2", attributes: bodyAttributes)]
           ),
           on: self.videoEditorQueue) }
 
