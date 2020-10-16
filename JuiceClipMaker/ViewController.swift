@@ -65,9 +65,9 @@ final class ViewController: UIViewController {
     let inputVideos: [URL] = [
       "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
       "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
-//      "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
-//      "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
-//      "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
+      "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
+      "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
+      "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
     ].map { URL(string: $0) }.compactMap { $0 }
 
     let superTitleAttributes: TextOverlayConfig.TextAttributes = [
@@ -104,6 +104,21 @@ final class ViewController: UIViewController {
       TextOverlayConfig(
         title: .init(string: "Pistol sit-ups", attributes: titleAttributes),
         bodyLines: [.init(string: "Reps 10", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Plain sit-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 10", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Push-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 20", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
                     .init(string: "Sets 2", attributes: bodyAttributes)]
       ),
     ]
