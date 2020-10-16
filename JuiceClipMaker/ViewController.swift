@@ -65,34 +65,55 @@ final class ViewController: UIViewController {
     let inputVideos: [URL] = [
       "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
       "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
-      "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
-      "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
-      "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
+//      "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
+//      "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
+//      "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
     ].map { URL(string: $0) }.compactMap { $0 }
 
-    self.composerQueue.async {
-      let titleAttributes: TextOverlayConfig.TextAttributes = [
-        .font: UIFont.systemFont(ofSize: 35),
-                             .foregroundColor: UIColor.white,
-                             .strokeColor: UIColor.white,
-                             .strokeWidth: -3,
-      ]
+    let superTitleAttributes: TextOverlayConfig.TextAttributes = [
+      .font: UIFont.systemFont(ofSize: 40),
+      .foregroundColor: UIColor.white,
+      .strokeColor: UIColor.white,
+      .strokeWidth: -3,
+    ]
 
-      let bodyAttributes: TextOverlayConfig.TextAttributes = [
-        .font: UIFont.italicSystemFont(ofSize: 20),
-        .foregroundColor: UIColor.darkGray,
-        .strokeColor: UIColor.darkGray,
-        .strokeWidth: -3,
-      ]
-      let videos = inputVideos
-        .enumerated()
+    let titleAttributes: TextOverlayConfig.TextAttributes = [
+      .font: UIFont.systemFont(ofSize: 35),
+      .foregroundColor: UIColor.white,
+      .strokeColor: UIColor.white,
+      .strokeWidth: -3,
+    ]
+
+    let bodyAttributes: TextOverlayConfig.TextAttributes = [
+      .font: UIFont.italicSystemFont(ofSize: 20),
+      .foregroundColor: UIColor.darkGray,
+      .strokeColor: UIColor.darkGray,
+      .strokeWidth: -3,
+    ]
+
+    let texts: [TextOverlayConfig] = [
+      TextOverlayConfig(
+        superTitle: .init(
+          string: "This is an example of how a training can be exported as a pretty video clip.",
+          attributes: superTitleAttributes
+        ),
+        title: .init(string: "Side plank", attributes: titleAttributes),
+        bodyLines: [.init(string: "Time 40", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pistol sit-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 10", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+    ]
+
+    self.composerQueue.async {
+
+      let videos = zip(inputVideos, texts)
         .map { self.processVideo(
-          at: $0.element,
-          textOverlay: TextOverlayConfig(
-            title: .init(string: "Title \($0.offset)", attributes: titleAttributes),
-            bodyLines: [.init(string: "Reps 10", attributes: bodyAttributes),
-                        .init(string: "Sets 2", attributes: bodyAttributes)]
-          ),
+          at: $0.0,
+          textOverlay: $0.1,
           on: self.videoEditorQueue) }
 
       self.editor.mergeVideos(urls: videos) { result in

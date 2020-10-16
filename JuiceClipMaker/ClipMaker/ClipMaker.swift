@@ -260,7 +260,68 @@ class ClipMaker: VideoDecorator {
     }
   }
 
+  // MARK: - Add text overlay
+
   private func add(textOverlay: TextOverlayConfig, to layer: CALayer, videoSize: CGSize) {
+    var superTitleTiming: CFTimeInterval = AVCoreAnimationBeginTimeAtZero
+    let color = UIColor(red: 85.0/255, green: 153.0/255, blue: 236.0/255, alpha: 1)
+    // MARK: - Super title
+    if let superTitle = textOverlay.superTitle {
+      superTitleTiming = 2
+
+      let width: CGFloat = videoSize.width - 60
+      let superTitleSize = superTitle.boundingRect(
+        with: CGSize(width: width, height: videoSize.height),
+        options: .usesLineFragmentOrigin,
+        context: nil
+      )
+
+      let titleBackgroundLayer = CALayer()
+      titleBackgroundLayer.backgroundColor = color.cgColor
+      titleBackgroundLayer.cornerRadius = 0
+
+      let backgroundSize = CGSize(width: videoSize.width, height: superTitleSize.height)
+
+      let yPosition = (videoSize.height - superTitleSize.height)/2
+
+      let initialBackgroundRect = CGRect(
+        origin: .init(x: -videoSize.width, y: yPosition),
+        size: backgroundSize
+      )
+      titleBackgroundLayer.frame = initialBackgroundRect
+
+      let superTitleLayer = CATextLayer()
+      superTitleLayer.string = superTitle
+      superTitleLayer.backgroundColor = color.cgColor
+      superTitleLayer.cornerRadius = 0
+      superTitleLayer.alignmentMode = .center
+      superTitleLayer.opacity = 0
+      superTitleLayer.isWrapped = true
+      superTitleLayer.frame = CGRect(origin: CGPoint(x: 20, y: yPosition), size: CGSize(width: videoSize.width - 40, height: superTitleSize.height))
+//        CGRect(
+//        x: 24,
+//        y: yPosition,
+//        width: width,
+//        height: superTitleSize.height
+//      )
+
+      let opacityAnimation = CAKeyframeAnimation(keyPath: "opacity")
+      opacityAnimation.values = [0, 1, 1, 0]
+      opacityAnimation.keyTimes = [0, 0.2, 0.95, 1]
+      opacityAnimation.duration = superTitleTiming
+      opacityAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+      opacityAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+      opacityAnimation.autoreverses = false
+      opacityAnimation.isRemovedOnCompletion = false
+      opacityAnimation.fillMode = .forwards
+
+      superTitleLayer.add(opacityAnimation, forKey: "super.title.opacity.animation")
+
+      layer.addSublayer(superTitleLayer)
+      superTitleLayer.setNeedsDisplay()
+    }
+
+    // MARK: - Calculate text sizes
     let titleSize = textOverlay.title.boundingRect(
       with: videoSize,
       options: .usesFontLeading,
@@ -281,7 +342,6 @@ class ClipMaker: VideoDecorator {
         break
       }
     }
-
     let maxWidth = bodySizes.max(by: { $0.width < $1.width })?.width ?? titleSize.width
 
     let overallTextSize = CGSize(
@@ -289,81 +349,73 @@ class ClipMaker: VideoDecorator {
       height: titleSize.height + bodySizes.compactMap { $0.height }.reduce (0, +)
     )
 
-    let color = UIColor(red: 85.0/255, green: 153.0/255, blue: 236.0/255, alpha: 1)
+    // MARK: - Title section setup
     let titleBackgroundLayer = CALayer()
+    let xOrigin = -titleSize.width - 45
     titleBackgroundLayer.backgroundColor = color.cgColor
     titleBackgroundLayer.cornerRadius = 4
     let backgroundSize = CGSize(width: titleSize.width + 24, height: titleSize.height)
-    let initialBackgroundRect = CGRect(origin: .init(x: -titleSize.width, y: overallTextSize.height), size: backgroundSize)
+    let initialBackgroundRect = CGRect(
+      origin: .init(x: xOrigin, y: overallTextSize.height),
+      size: backgroundSize
+    )
     titleBackgroundLayer.frame = initialBackgroundRect
-
+    // MARK: - title background slide from the left
+    let titleBackgroundSlideAnimationDuration: CFTimeInterval = 0.8
     let titleBackgroundSlideAnimation = CABasicAnimation(keyPath: "position.x")
-    titleBackgroundSlideAnimation.fromValue = -titleSize.width
+    titleBackgroundSlideAnimation.fromValue = xOrigin
     titleBackgroundSlideAnimation.toValue = titleSize.width/2 + 40
-    titleBackgroundSlideAnimation.duration = 0.8
+    titleBackgroundSlideAnimation.duration = titleBackgroundSlideAnimationDuration
     titleBackgroundSlideAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-    titleBackgroundSlideAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+    titleBackgroundSlideAnimation.beginTime = AVCoreAnimationBeginTimeAtZero + superTitleTiming
     titleBackgroundSlideAnimation.autoreverses = false
     titleBackgroundSlideAnimation.isRemovedOnCompletion = false
     titleBackgroundSlideAnimation.fillMode = .forwards
 
     titleBackgroundLayer.add(titleBackgroundSlideAnimation, forKey: nil)
 
+    // MARK: - title background resize animation group
     let titleBackgroundFrameAnimation = CABasicAnimation(keyPath: "bounds")
-    titleBackgroundFrameAnimation.fromValue = CGRect(origin: .zero, size: titleSize.size)
-    titleBackgroundFrameAnimation.toValue = CGRect(origin: .zero, size: CGSize(width: 10, height: titleSize.height))
-    titleBackgroundFrameAnimation.duration = 0.4
-    titleBackgroundFrameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-    titleBackgroundFrameAnimation.beginTime = 0.82
-    titleBackgroundFrameAnimation.autoreverses = false
-    titleBackgroundFrameAnimation.isRemovedOnCompletion = false
-    titleBackgroundFrameAnimation.fillMode = .forwards
+    titleBackgroundFrameAnimation.fromValue = CGRect(origin: titleBackgroundLayer.anchorPoint, size: titleSize.size)
+    titleBackgroundFrameAnimation.toValue = CGRect(origin: titleBackgroundLayer.anchorPoint, size: CGSize(width: 10, height: titleSize.height))
 
     let titleBackgroundRestorePositionAnimation = CABasicAnimation(keyPath: "position.x")
     titleBackgroundRestorePositionAnimation.fromValue = titleSize.width/2 + 40
     titleBackgroundRestorePositionAnimation.toValue = 36
-    titleBackgroundRestorePositionAnimation.duration = 0.4
-    titleBackgroundRestorePositionAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-    titleBackgroundRestorePositionAnimation.beginTime = 0.80
-    titleBackgroundRestorePositionAnimation.autoreverses = false
-    titleBackgroundRestorePositionAnimation.isRemovedOnCompletion = false
-    titleBackgroundRestorePositionAnimation.fillMode = .forwards
 
     let group = CAAnimationGroup()
     group.fillMode = .forwards
-    group.duration = 0.4
-    group.beginTime = 0.81
-    group.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+    group.duration = 0.45
+    group.beginTime = superTitleTiming + titleBackgroundSlideAnimationDuration - 0.1
+    group.timingFunction = CAMediaTimingFunction(name: .linear)
+    group.isRemovedOnCompletion = false
     group.animations = [titleBackgroundRestorePositionAnimation, titleBackgroundFrameAnimation]
 
     titleBackgroundLayer.add(titleBackgroundSlideAnimation, forKey: nil)
-
-    titleBackgroundLayer.add(titleBackgroundFrameAnimation, forKey: nil)
-    titleBackgroundLayer.add(titleBackgroundRestorePositionAnimation, forKey: nil)
-//    titleBackgroundLayer.add(group, forKey: "frame")
+    titleBackgroundLayer.add(group, forKey: "frame")
 
     layer.addSublayer(titleBackgroundLayer)
     titleBackgroundLayer.setNeedsDisplay()
-
+    // MARK: - title layer
     let titleLayer = CATextLayer()
     titleLayer.string = textOverlay.title
     titleLayer.backgroundColor = UIColor.clear.cgColor
     titleLayer.alignmentMode = .center
 
     titleLayer.frame = CGRect(
-      x: -titleSize.width,
+      x: xOrigin,
       y: overallTextSize.height,
       width: titleSize.width + 24,
       height: titleSize.height
     )
     titleLayer.displayIfNeeded()
-
+    // MARK: - title layer slide from the left
     let frameAnimation = CABasicAnimation(keyPath: "position.x")
-    frameAnimation.fromValue = -titleSize.width
+    frameAnimation.fromValue = xOrigin
     frameAnimation.toValue = titleSize.width/2 + 46
     frameAnimation.duration = 0.8
     frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-    frameAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+    frameAnimation.beginTime = superTitleTiming
     frameAnimation.autoreverses = false
     frameAnimation.isRemovedOnCompletion = false
     frameAnimation.fillMode = .forwards
@@ -373,6 +425,7 @@ class ClipMaker: VideoDecorator {
     layer.addSublayer(titleLayer)
     titleLayer.setNeedsDisplay()
 
+    // MARK: - Body lines
     var yPosition = overallTextSize.height
     zip(bodySizes, textOverlay.bodyLines).enumerated().forEach { (offset, element) in
 
@@ -397,7 +450,7 @@ class ClipMaker: VideoDecorator {
       opacityAnimation.toValue = 1
       opacityAnimation.duration = animationDuration
       opacityAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-      opacityAnimation.beginTime = 0.8 + Double(offset)*animationDuration
+      opacityAnimation.beginTime = superTitleTiming + titleBackgroundSlideAnimationDuration + Double(offset)*animationDuration
       opacityAnimation.autoreverses = false
       opacityAnimation.isRemovedOnCompletion = false
       opacityAnimation.fillMode = .forwards
@@ -409,6 +462,7 @@ class ClipMaker: VideoDecorator {
     }
   }
 
+  // MARK: - Add simple text
   private func add(text: String, backgroundColor: UIColor, to layer: CALayer, videoSize: CGSize) {
     let attributedText = NSAttributedString(
       string: text,
