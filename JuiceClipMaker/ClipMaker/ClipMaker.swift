@@ -267,7 +267,8 @@ class ClipMaker: VideoDecorator {
 
   private func add(textOverlay: TextOverlayConfig, to layer: CALayer, videoSize: CGSize) {
     var superTitleTiming: CFTimeInterval = AVCoreAnimationBeginTimeAtZero
-    let color = UIColor(red: 85.0/255, green: 153.0/255, blue: 236.0/255, alpha: 1)
+    let color = UIColor(red: 85.0/255, green: 169.0/255, blue: 244.0/255, alpha: 1)
+
     // MARK: - Super title
     if let superTitle = textOverlay.superTitle {
       superTitleTiming = 2
@@ -301,7 +302,6 @@ class ClipMaker: VideoDecorator {
 
       layer.addSublayer(titleBackgroundLayer)
       titleBackgroundLayer.setNeedsDisplay()
-
 
 
 //      let initialBackgroundRect = CGRect(
