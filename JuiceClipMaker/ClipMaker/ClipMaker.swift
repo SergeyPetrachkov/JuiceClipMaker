@@ -69,11 +69,14 @@ class ClipMaker: VideoDecorator {
 
     let color = UIColor(red: 85.0/255, green: 153.0/255, blue: 236.0/255, alpha: 1)
     backgroundLayer.backgroundColor = color.cgColor
-    videoLayer.frame = CGRect(
-      x: 20,
-      y: 20,
-      width: videoSize.width - 40,
-      height: videoSize.height - 40)
+    videoLayer.frame = CGRect(origin: .zero, size: videoSize)
+    // TODO: - blue border
+//      CGRect(
+//      x: 20,
+//      y: 20,
+//      width: videoSize.width - 40,
+//      height: videoSize.height - 40
+//    )
 
     backgroundLayer.contents = UIImage.from(color: color).cgImage
     backgroundLayer.contentsGravity = .resizeAspectFill
@@ -82,7 +85,7 @@ class ClipMaker: VideoDecorator {
 
     let outputLayer = CALayer()
     outputLayer.frame = CGRect(origin: .zero, size: videoSize)
-    outputLayer.addSublayer(backgroundLayer)
+//    outputLayer.addSublayer(backgroundLayer)
     outputLayer.addSublayer(videoLayer)
     outputLayer.addSublayer(overlayLayer)
 
@@ -276,38 +279,52 @@ class ClipMaker: VideoDecorator {
         context: nil
       )
 
+      let backgroundSize = CGSize(width: videoSize.width, height: superTitleSize.height)
+      let yPosition = (videoSize.height - superTitleSize.height)/2
+
       let titleBackgroundLayer = CALayer()
       titleBackgroundLayer.backgroundColor = color.cgColor
       titleBackgroundLayer.cornerRadius = 0
+      titleBackgroundLayer.frame = CGRect(origin: CGPoint(x: -videoSize.width, y: yPosition), size: CGSize(width: videoSize.width, height: superTitleSize.height))
 
-      let backgroundSize = CGSize(width: videoSize.width, height: superTitleSize.height)
+      let superTitleBackgroundLayerAnimation = CAKeyframeAnimation(keyPath: "position.x")
+      superTitleBackgroundLayerAnimation.values = [-videoSize.width, videoSize.width/2, videoSize.width/2, 2*videoSize.width]
+      superTitleBackgroundLayerAnimation.keyTimes = [0, 0.2, 0.9, 1]
+      superTitleBackgroundLayerAnimation.duration = superTitleTiming
+      superTitleBackgroundLayerAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+      superTitleBackgroundLayerAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
+      superTitleBackgroundLayerAnimation.autoreverses = false
+      superTitleBackgroundLayerAnimation.isRemovedOnCompletion = false
+      superTitleBackgroundLayerAnimation.fillMode = .forwards
 
-      let yPosition = (videoSize.height - superTitleSize.height)/2
+      titleBackgroundLayer.add(superTitleBackgroundLayerAnimation, forKey: "super.title.background.animation")
 
-      let initialBackgroundRect = CGRect(
-        origin: .init(x: -videoSize.width, y: yPosition),
-        size: backgroundSize
-      )
-      titleBackgroundLayer.frame = initialBackgroundRect
+      layer.addSublayer(titleBackgroundLayer)
+      titleBackgroundLayer.setNeedsDisplay()
+
+
+
+//      let initialBackgroundRect = CGRect(
+//        origin: .init(x: -videoSize.width, y: yPosition),
+//        size: backgroundSize
+//      )
+//      titleBackgroundLayer.frame = initialBackgroundRect
 
       let superTitleLayer = CATextLayer()
       superTitleLayer.string = superTitle
-      superTitleLayer.backgroundColor = color.cgColor
+      superTitleLayer.backgroundColor = UIColor.clear.cgColor//color.cgColor
       superTitleLayer.cornerRadius = 0
       superTitleLayer.alignmentMode = .center
       superTitleLayer.opacity = 0
       superTitleLayer.isWrapped = true
-      superTitleLayer.frame = CGRect(origin: CGPoint(x: 20, y: yPosition), size: CGSize(width: videoSize.width - 40, height: superTitleSize.height))
-//        CGRect(
-//        x: 24,
-//        y: yPosition,
-//        width: width,
-//        height: superTitleSize.height
-//      )
+      superTitleLayer.frame = CGRect(
+        origin: CGPoint(x: 20, y: yPosition),
+        size: CGSize(width: videoSize.width - 40, height: superTitleSize.height)
+      )
 
       let opacityAnimation = CAKeyframeAnimation(keyPath: "opacity")
-      opacityAnimation.values = [0, 1, 1, 0]
-      opacityAnimation.keyTimes = [0, 0.2, 0.95, 1]
+      opacityAnimation.values = [0, 0, 1, 1, 0, 0]
+      opacityAnimation.keyTimes = [0, 0.2, 0.4, 0.7, 1]
       opacityAnimation.duration = superTitleTiming
       opacityAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
       opacityAnimation.beginTime = AVCoreAnimationBeginTimeAtZero
