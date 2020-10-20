@@ -280,7 +280,6 @@ class ClipMaker: VideoDecorator {
         context: nil
       )
 
-      let backgroundSize = CGSize(width: videoSize.width, height: superTitleSize.height)
       let yPosition = (videoSize.height - superTitleSize.height)/2
 
       let titleBackgroundLayer = CALayer()
@@ -303,16 +302,9 @@ class ClipMaker: VideoDecorator {
       layer.addSublayer(titleBackgroundLayer)
       titleBackgroundLayer.setNeedsDisplay()
 
-
-//      let initialBackgroundRect = CGRect(
-//        origin: .init(x: -videoSize.width, y: yPosition),
-//        size: backgroundSize
-//      )
-//      titleBackgroundLayer.frame = initialBackgroundRect
-
       let superTitleLayer = CATextLayer()
       superTitleLayer.string = superTitle
-      superTitleLayer.backgroundColor = UIColor.clear.cgColor//color.cgColor
+      superTitleLayer.backgroundColor = UIColor.clear.cgColor
       superTitleLayer.cornerRadius = 0
       superTitleLayer.alignmentMode = .center
       superTitleLayer.opacity = 0
