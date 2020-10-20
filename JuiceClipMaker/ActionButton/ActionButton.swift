@@ -22,7 +22,7 @@ final class ActionButton: UIButton {
     self.config = config
     super.init(frame: .zero)
     self.addTarget(self, action: #selector(self.didTapSelf), for: .touchUpInside)
-    self.layer.cornerRadius = 10
+    self.layer.cornerRadius = self.config.cornerRadius
     self.clipsToBounds = true
     self.setTitle(self.config.buttonTitle, for: .normal)
     self.setBackgroundImage(UIImage.from(color: self.config.buttonBackground), for: .normal)
