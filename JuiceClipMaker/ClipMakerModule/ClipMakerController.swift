@@ -14,12 +14,18 @@ public final class ClipMakerController: UIViewController {
 
   // MARK: - Configurators
   private let actionButtonConfig: ClipMakerActionButtonConfig
-  private let dataContext: ClipMakerContext
 
+  let viewModel: ClipMakerViewModel
   // MARK: - Initializers
   public init(actionButtonConfig: ClipMakerActionButtonConfig, dataContext: ClipMakerContext) {
     self.actionButtonConfig = actionButtonConfig
-    self.dataContext = dataContext
+    self.viewModel = ClipMakerViewModel(dataContext: dataContext)
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  public init(actionButtonConfig: ClipMakerActionButtonConfig, viewModel: ClipMakerViewModel) {
+    self.actionButtonConfig = actionButtonConfig
+    self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -77,7 +83,7 @@ public final class ClipMakerController: UIViewController {
                     .init(string: "Sets 2", attributes: bodyAttributes)]
       ),
     ]
-    self.dataContext = .init(
+    let dataContext = ClipMakerContext(
       media: [
         "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
         "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
@@ -87,6 +93,7 @@ public final class ClipMakerController: UIViewController {
       ],
       textOverlays: texts
     )
+    self.viewModel = .init(dataContext: dataContext)
     super.init(coder: coder)
   }
   // MARK: - Essentials
@@ -123,13 +130,57 @@ public final class ClipMakerController: UIViewController {
     self.setupLayout()
     self.generateButton.addTarget(self, action: #selector(self.didTapActionButton), for: .touchUpInside)
     self.actionButton.tapHandler = { [weak self] in
-      self?.generateVideo()
+      self?.viewModel.generateVideo()
     }
     self.navigationItem.rightBarButtonItem = UIBarButtonItem(
       barButtonSystemItem: .save,
       target: self,
       action: #selector(self.didTapSave)
     )
+
+    self.viewModel.didStartMakingVideo = { [weak self] in
+      self?.actionButton.enterPendingState()
+    }
+
+    self.viewModel.didFinishMakingVideo = { [weak self] result in
+      guard let self = self else {
+        return
+      }
+      switch result {
+      case .success(let exportedURL):
+        DispatchQueue.main.async {
+          self.showVideo(url: exportedURL)
+          self.actionButton.exitPendingState()
+        }
+      case .failure(let error):
+        print(error)
+        DispatchQueue.main.async {
+          let alert = UIAlertController(title: "Error!", message: error.localizedDescription, preferredStyle: .alert)
+          let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
+          alert.addAction(ok)
+          self.present(alert, animated: true, completion: nil)
+          self.actionButton.exitPendingState()
+        }
+      }
+    }
+
+    self.viewModel.didSaveVideo = { [weak self] in
+
+    }
+
+    self.viewModel.didFailToSaveVideo = { [weak self] in
+      guard let self = self else {
+        return
+      }
+      let alert = UIAlertController(
+        title: "Nothing to save!",
+        message: "Press generate and wait for a video to appear.",
+        preferredStyle: .alert
+      )
+      let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
+      alert.addAction(ok)
+      self.present(alert, animated: true, completion: nil)
+    }
   }
 
   // MARK: - Actions
@@ -148,120 +199,38 @@ public final class ClipMakerController: UIViewController {
 
     self.present(alert, animated: true, completion: nil)
     #else
-    self.generateVideo()
+    self.viewModel.generateVideo()
     #endif
   }
 
   @objc
   private func didTapSave() {
-    guard let url = currentItemURL else {
-      let alert = UIAlertController(
-        title: "Nothing to save!",
-        message: "Press generate and wait for a video to appear.",
-        preferredStyle: .alert
-      )
-      let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
-      alert.addAction(ok)
-      self.present(alert, animated: true, completion: nil)
-      return
-    }
-    PHPhotoLibrary.shared().performChanges({
-      PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
-    }) { saved, error in
-      if saved {
-        debugPrint("video has been saved to gallery")
-      }
-    }
+    self.viewModel.saveVideo()
   }
-
-  var currentItemURL: URL?
 }
 
 private extension ClipMakerController {
 
   func enterPendingState() {
-    self.actionButton.enterPendingState()
+
   }
 
   func exitPendingState() {
     self.actionButton.exitPendingState()
   }
 
-  func generateVideo() {
-    self.enterPendingState()
-    self.composerQueue.async {
-
-      let videos = zip(self.dataContext.media.compactMap { URL(string: $0) }, self.dataContext.textOverlays)
-        .map { self.processVideo(
-          at: $0.0,
-          textOverlay: $0.1,
-          on: self.videoEditorQueue) }
-
-      self.editor.mergeVideos(urls: videos) { result in
-        switch result {
-        case .success(let exportedURL):
-          self.currentItemURL = exportedURL
-          DispatchQueue.main.async {
-            self.showVideo(url: exportedURL)
-            self.exitPendingState()
-          }
-        case .failure(let error):
-          print(error)
-          DispatchQueue.main.async {
-            let alert = UIAlertController(title: "Error!", message: error.localizedDescription, preferredStyle: .alert)
-            let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
-            alert.addAction(ok)
-            self.present(alert, animated: true, completion: nil)
-            self.exitPendingState()
-          }
-        }
-      }
-    }
-  }
-
-  func processVideo(at url: URL, textOverlay: TextOverlayConfig, on queue: DispatchQueue) -> URL {
-    var resultUrl: URL?
-    let dispatchGroup = DispatchGroup()
-    dispatchGroup.enter()
-    queue.async {
-      self.editor.decorateVideoWithEffects(videoURL: url, textOverlay: textOverlay) { result in
-        resultUrl = try? result.get()
-        dispatchGroup.leave()
-      }
-    }
-    dispatchGroup.wait()
-    return resultUrl ?? url
-  }
-
   func setupLayout() {
+    self.videoView.translatesAutoresizingMaskIntoConstraints = false
+    self.videoView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+    self.videoView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+    self.videoView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.75).isActive = true
+    self.videoView.topAnchor.constraint(equalTo: self.view.layoutMarginsGuide.topAnchor, constant: 20).isActive = true
+
     self.actionButton.translatesAutoresizingMaskIntoConstraints = false
     self.actionButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     self.actionButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
     self.actionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     self.actionButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30).isActive = true
-  }
-
-  func generate(url: URL, name: String) {
-    self.editor.decorateVideoWithEffects(videoURL: url, addingText: name) { [weak self] result in
-
-      guard let self = self else {
-        return
-      }
-      switch result {
-      case .success(let exportedURL):
-        self.layer?.removeFromSuperlayer()
-        self.player = nil
-        let player = AVPlayer(url: exportedURL)
-        let playerLayer = AVPlayerLayer(player: player)
-        self.player = player
-        self.layer = playerLayer
-        playerLayer.frame = self.videoView.bounds
-        self.videoView.layer.addSublayer(playerLayer)
-        player.play()
-      case .failure(let error):
-        print(error)
-      }
-    }
   }
 
   func showVideo(url: URL) {

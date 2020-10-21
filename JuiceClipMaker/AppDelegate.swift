@@ -78,9 +78,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       textOverlays: texts
     )
     let makerModule = ClipMakerModuleAssembly.createModule(actionButtonConfig: .init(), dataContext: context)
-    makerModule.title = "Clip Maker"
+    makerModule.view.title = "Clip Maker"
     let navController = UINavigationController(
-      rootViewController: makerModule
+      rootViewController: makerModule.view
     )
 
     window.rootViewController = navController

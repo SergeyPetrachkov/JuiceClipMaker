@@ -20,6 +20,7 @@
 		A5AAB06E2530654B00FC164D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06C2530654B00FC164D /* Main.storyboard */; };
 		A5AAB0702530654D00FC164D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06F2530654D00FC164D /* Assets.xcassets */; };
 		A5AAB0732530654D00FC164D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB0712530654D00FC164D /* LaunchScreen.storyboard */; };
+		A5F1C8A225406167001008A0 /* ClipMakerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		A5AAB06F2530654D00FC164D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A5AAB0722530654D00FC164D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A5AAB0742530654D00FC164D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				A57D67FF253F01A100A49E5B /* ClipMakerActionButtonConfig.swift */,
 				A57D6802253F01BE00A49E5B /* ClipMakerContext.swift */,
 				A57D6805253F020300A49E5B /* ClipMakerModuleAssembly.swift */,
+				A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */,
 			);
 			path = ClipMakerModule;
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 				A5AAB06B2530654B00FC164D /* ClipMakerController.swift in Sources */,
 				A515FDDC2531CD0F00106789 /* MergeVideos.swift in Sources */,
 				A570747E2531CA6100301B11 /* VideoDecorator.swift in Sources */,
+				A5F1C8A225406167001008A0 /* ClipMakerViewModel.swift in Sources */,
 				A57D6800253F01A100A49E5B /* ClipMakerActionButtonConfig.swift in Sources */,
 				A57D6806253F020300A49E5B /* ClipMakerModuleAssembly.swift in Sources */,
 				A56136BC2535B3260037A899 /* TextOverlay.swift in Sources */,

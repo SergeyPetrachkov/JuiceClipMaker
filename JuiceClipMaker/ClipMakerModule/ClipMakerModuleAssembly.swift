@@ -11,7 +11,9 @@ public enum ClipMakerModuleAssembly {
   public static func createModule(
     actionButtonConfig: ClipMakerActionButtonConfig,
     dataContext: ClipMakerContext
-  ) -> ClipMakerController {
-    return ClipMakerController(actionButtonConfig: actionButtonConfig, dataContext: dataContext)
+  ) -> (view: ClipMakerController, viewModel: ClipMakerViewModel) {
+    let viewModel = ClipMakerViewModel(dataContext: dataContext)
+    let view = ClipMakerController(actionButtonConfig: actionButtonConfig, viewModel: viewModel)
+    return (view: view, viewModel: viewModel)
   }
 }
