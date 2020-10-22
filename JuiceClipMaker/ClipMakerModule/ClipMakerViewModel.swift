@@ -19,7 +19,7 @@ public final class ClipMakerViewModel {
     case noVideo
   }
   public enum State {
-    case initial
+    case initial(URL?)
     case generating
     case generated(URL)
     case saving
@@ -40,7 +40,7 @@ public final class ClipMakerViewModel {
   // MARK: - Context
   private let dataContext: ClipMakerContext
   private var currentUrl: URL?
-  private(set) var state: State = .initial {
+  private(set) var state: State {
     didSet {
       self.output?.didChangeState(self.state)
     }
@@ -54,6 +54,12 @@ public final class ClipMakerViewModel {
   // MARK: - Initializers
   public init(dataContext: ClipMakerContext) {
     self.dataContext = dataContext
+    if let placeholder = self.dataContext.placeholder {
+      let url = URL(string: placeholder)
+      self.state = .initial(url)
+    } else {
+      self.state = .initial(nil)
+    }
   }
 
   public func primaryAction() {

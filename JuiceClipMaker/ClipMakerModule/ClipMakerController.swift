@@ -94,6 +94,7 @@ public final class ClipMakerController: UIViewController {
       ),
     ]
     let dataContext = ClipMakerContext(
+      placeholder: "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.jpg",
       media: [
         "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
         "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
@@ -110,14 +111,10 @@ public final class ClipMakerController: UIViewController {
   // MARK: - UI
   private var player: AVPlayer?
   private var layer: AVPlayerLayer?
-  lazy private var videoView: UIView = {
-    let view = UIView(
-      frame: .init(origin: .zero,
-                   size: .init(width: self.view.bounds.width,
-                               height: self.view.bounds.width * 0.667)
-      )
-    )
+  lazy private var videoView: UIImageView = {
+    let view = UIImageView(frame: .zero)
     view.backgroundColor = UIColor.lightGray
+    view.contentMode = .scaleAspectFit
     return view
   }()
 
@@ -131,7 +128,6 @@ public final class ClipMakerController: UIViewController {
   override public func viewDidLoad() {
     super.viewDidLoad()
     self.view.backgroundColor = .white
-    self.videoView.center = self.view.center
     self.view.addSubview(self.videoView)
     self.view.addSubview(self.actionButton)
     self.view.addSubview(self.line)
@@ -245,7 +241,7 @@ private extension ClipMakerController {
     self.videoView.translatesAutoresizingMaskIntoConstraints = false
     self.videoView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     self.videoView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
-    self.videoView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.75).isActive = true
+    self.videoView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.667).isActive = true
     self.videoView.topAnchor.constraint(equalTo: self.view.layoutMarginsGuide.topAnchor, constant: 20).isActive = true
 
     self.actionButton.translatesAutoresizingMaskIntoConstraints = false
@@ -286,13 +282,15 @@ private extension ClipMakerController {
 extension ClipMakerController: ClipMakerViewModelOutput {
   public func didChangeState(_ state: ClipMakerViewModel.State) {
     switch state {
-    case .initial:
-      break
+    case .initial(let url):
+      guard let url = url else {
+        return
+      }
+      self.videoView.load(url: url)
     case .generating:
       self.title = "Generating video..."
-      break
     case .generated(let url):
-      break
+      self.showVideo(url: url)
     case .saving:
       break
     case .saved:
@@ -309,6 +307,20 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       alert.addAction(okAction)
 
       self.present(alert, animated: true, completion: nil)
+    }
+  }
+}
+
+private extension UIImageView {
+  func load(url: URL) {
+    DispatchQueue.global().async { [weak self] in
+      if let data = try? Data(contentsOf: url) {
+        if let image = UIImage(data: data) {
+          DispatchQueue.main.async {
+            self?.image = image
+          }
+        }
+      }
     }
   }
 }

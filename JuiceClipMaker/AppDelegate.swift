@@ -68,6 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       ),
     ]
     let context = ClipMakerContext(
+      placeholder: "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.jpg",
       media: [
         "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.mp4",
         "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
