@@ -124,6 +124,12 @@ public final class ClipMakerController: UIViewController {
 
   lazy private var secondaryActionButton = ActionButton(self.secondaryActionButtonConfig)
 
+  lazy var activityIndicator: UIActivityIndicatorView = {
+    let style: UIActivityIndicatorView.Style = .whiteLarge
+    let view = UIActivityIndicatorView(style: style)
+    return view
+  }()
+
   // MARK: - Life cycle
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -146,35 +152,17 @@ public final class ClipMakerController: UIViewController {
       action: #selector(self.didTapSave)
     )
 
-    self.viewModel.didStartMakingVideo = { [weak self] in
-      self?.actionButton.enterPendingState()
-    }
+//    self.viewModel.didStartMakingVideo = { [weak self] in
+//      self?.actionButton.enterPendingState()
+//    }
 
-    self.viewModel.didFinishMakingVideo = { [weak self] result in
-      guard let self = self else {
-        return
-      }
-      switch result {
-      case .success(let exportedURL):
-        DispatchQueue.main.async {
-          self.showVideo(url: exportedURL)
-          self.actionButton.exitPendingState()
-        }
-      case .failure(let error):
-        print(error)
-        DispatchQueue.main.async {
-          let alert = UIAlertController(title: "Error!", message: error.localizedDescription, preferredStyle: .alert)
-          let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
-          alert.addAction(ok)
-          self.present(alert, animated: true, completion: nil)
-          self.actionButton.exitPendingState()
-        }
-      }
-    }
+//    self.viewModel.didFinishMakingVideo = { [weak self] result in
+//
+//    }
 
-    self.viewModel.didSaveVideo = { [weak self] in
-
-    }
+//    self.viewModel.didSaveVideo = { [weak self] in
+//
+//    }
 
     self.viewModel.didFailToSaveVideo = { [weak self] in
       guard let self = self else {
@@ -228,11 +216,17 @@ public final class ClipMakerController: UIViewController {
 private extension ClipMakerController {
 
   func enterPendingState() {
-
+    self.videoView.addSubview(self.activityIndicator)
+    self.activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+    self.activityIndicator.centerXAnchor.constraint(equalTo: self.videoView.centerXAnchor).isActive = true
+    self.activityIndicator.centerYAnchor.constraint(equalTo: self.videoView.centerYAnchor).isActive = true
+    self.activityIndicator.startAnimating()
   }
 
   func exitPendingState() {
     self.actionButton.exitPendingState()
+    self.activityIndicator.stopAnimating()
+    self.activityIndicator.removeFromSuperview()
   }
 
   func setupLayout() {
@@ -258,12 +252,10 @@ private extension ClipMakerController {
     self.line.topAnchor.constraint(equalTo: self.actionButton.bottomAnchor, constant: 0).isActive = true
 
     self.secondaryActionButton.translatesAutoresizingMaskIntoConstraints = false
-    self.secondaryActionButton.translatesAutoresizingMaskIntoConstraints = false
     self.secondaryActionButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     self.secondaryActionButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
     self.secondaryActionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     self.secondaryActionButton.topAnchor.constraint(equalTo: self.line.bottomAnchor, constant: 0).isActive = true
-
   }
 
   func showVideo(url: URL) {
@@ -289,10 +281,16 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       self.videoView.load(url: url)
     case .generating:
       self.title = "Generating video..."
+      self.enterPendingState()
+      self.actionButton.disable()
+      self.secondaryActionButton.disable()
     case .generated(let url):
       self.showVideo(url: url)
+      self.actionButton.enable()
+      self.secondaryActionButton.enable()
     case .saving:
-      break
+      self.actionButton.disable()
+      self.secondaryActionButton.disable()
     case .saved:
       break
     case .failed(let error):
@@ -307,6 +305,8 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       alert.addAction(okAction)
 
       self.present(alert, animated: true, completion: nil)
+      self.actionButton.enable()
+      self.secondaryActionButton.enable()
     }
   }
 }

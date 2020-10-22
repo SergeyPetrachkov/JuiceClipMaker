@@ -26,7 +26,7 @@ final class ActionButton: UIButton {
     self.clipsToBounds = true
     self.setTitle(self.config.buttonTitle, for: .normal)
     self.setTitleColor(self.config.buttonTitleColor, for: .normal)
-    self.setTitleColor(self.config.buttonTitleColor.inverted, for: .highlighted)
+    self.setTitleColor(.gray, for: .disabled)
     self.setBackgroundImage(UIImage.from(color: self.config.buttonBackground), for: .normal)
   }
 
@@ -59,6 +59,14 @@ final class ActionButton: UIButton {
       self.activityIndicator.stopAnimating()
       self.activityIndicator.removeFromSuperview()
     }
+  }
+
+  func disable() {
+    self.isEnabled = false
+  }
+
+  func enable() {
+    self.isEnabled = true
   }
 }
 
