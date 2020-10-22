@@ -25,6 +25,8 @@ final class ActionButton: UIButton {
     self.layer.cornerRadius = self.config.cornerRadius
     self.clipsToBounds = true
     self.setTitle(self.config.buttonTitle, for: .normal)
+    self.setTitleColor(self.config.buttonTitleColor, for: .normal)
+    self.setTitleColor(self.config.buttonTitleColor.inverted, for: .highlighted)
     self.setBackgroundImage(UIImage.from(color: self.config.buttonBackground), for: .normal)
   }
 
@@ -57,5 +59,12 @@ final class ActionButton: UIButton {
       self.activityIndicator.stopAnimating()
       self.activityIndicator.removeFromSuperview()
     }
+  }
+}
+
+extension UIColor {
+  var inverted: UIColor {
+    var a: CGFloat = 0.0, r: CGFloat = 0.0, g: CGFloat = 0.0, b: CGFloat = 0.0
+    return getRed(&r, green: &g, blue: &b, alpha: &a) ? UIColor(red: 1.0-r, green: 1.0-g, blue: 1.0-b, alpha: a) : .black
   }
 }

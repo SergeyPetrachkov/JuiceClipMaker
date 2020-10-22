@@ -9,11 +9,12 @@ import Foundation
 
 public enum ClipMakerModuleAssembly {
   public static func createModule(
-    actionButtonConfig: ClipMakerActionButtonConfig,
+    uiConfig: ClipMakerUIConfig,
     dataContext: ClipMakerContext
   ) -> (view: ClipMakerController, viewModel: ClipMakerViewModel) {
     let viewModel = ClipMakerViewModel(dataContext: dataContext)
-    let view = ClipMakerController(actionButtonConfig: actionButtonConfig, viewModel: viewModel)
+    let view = ClipMakerController(uiConfig: uiConfig, viewModel: viewModel)
+    viewModel.output = view
     return (view: view, viewModel: viewModel)
   }
 }

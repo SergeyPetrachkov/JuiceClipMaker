@@ -9,15 +9,42 @@ import AVKit
 import Foundation
 import Photos
 
+
+public protocol ClipMakerViewModelOutput: AnyObject {
+  func didChangeState(_ state: ClipMakerViewModel.State)
+}
+
 public final class ClipMakerViewModel {
+  public enum Errors: Swift.Error {
+    case noVideo
+  }
+  public enum State {
+    case initial
+    case generating
+    case generated(URL)
+    case saving
+    case saved
+    case failed(Error)
+  }
   // MARK: - Connectors
   public var didStartMakingVideo: (() -> Void)?
   public var didFinishMakingVideo: ((Result<URL, Error>) -> Void)?
   public var didSaveVideo: (() -> Void)?
   public var didFailToSaveVideo: (() -> Void)?
+
+  public weak var output: ClipMakerViewModelOutput? {
+    didSet {
+      self.output?.didChangeState(self.state)
+    }
+  }
   // MARK: - Context
   private let dataContext: ClipMakerContext
   private var currentUrl: URL?
+  private(set) var state: State = .initial {
+    didSet {
+      self.output?.didChangeState(self.state)
+    }
+  }
   // MARK: - Essentials
   private let editor = ClipMaker()
 
@@ -29,7 +56,16 @@ public final class ClipMakerViewModel {
     self.dataContext = dataContext
   }
 
+  public func primaryAction() {
+
+  }
+
+  public func secondaryAction() {
+
+  }
+
   public func generateVideo() {
+    self.state = .generating
     self.didStartMakingVideo?()
     self.composerQueue.async {
 
@@ -43,24 +79,32 @@ public final class ClipMakerViewModel {
         }
 
       self.editor.mergeVideos(urls: videos) { [weak self] result in
+        switch result {
+        case .success(let url):
+          self?.state = .generated(url)
+        case .failure(let error):
+          self?.state = .failed(error)
+        }
         self?.didFinishMakingVideo?(result)
       }
     }
   }
 
   public func saveVideo() {
-    guard let url = self.currentUrl else {
-      self.didFailToSaveVideo?()
+
+    guard case State.generated(let url) = self.state else {
       return
     }
-
+    self.state = .saving
     PHPhotoLibrary.shared().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
     }) { saved, error in
-      if error != nil {
+      if let error = error {
         self.didFailToSaveVideo?()
+        self.state = .failed(error)
       } else {
         self.didSaveVideo?()
+        self.state = .saved
       }
     }
   }

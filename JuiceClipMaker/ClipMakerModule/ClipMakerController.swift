@@ -13,24 +13,34 @@ import Photos
 public final class ClipMakerController: UIViewController {
 
   // MARK: - Configurators
-  private let actionButtonConfig: ClipMakerActionButtonConfig
+  private let uiConfig: ClipMakerUIConfig
+  private var actionButtonConfig: ClipMakerActionButtonConfig {
+    return self.uiConfig.primaryActionConfig
+  }
+  private var secondaryActionButtonConfig: ClipMakerActionButtonConfig {
+    return self.uiConfig.secondaryActionConfig
+  }
 
   let viewModel: ClipMakerViewModel
   // MARK: - Initializers
-  public init(actionButtonConfig: ClipMakerActionButtonConfig, dataContext: ClipMakerContext) {
-    self.actionButtonConfig = actionButtonConfig
+  public init(uiConfig: ClipMakerUIConfig, dataContext: ClipMakerContext) {
+    self.uiConfig = uiConfig
     self.viewModel = ClipMakerViewModel(dataContext: dataContext)
     super.init(nibName: nil, bundle: nil)
   }
 
-  public init(actionButtonConfig: ClipMakerActionButtonConfig, viewModel: ClipMakerViewModel) {
-    self.actionButtonConfig = actionButtonConfig
+  public init(uiConfig: ClipMakerUIConfig, viewModel: ClipMakerViewModel) {
+    self.uiConfig = uiConfig
     self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
   }
 
   required init?(coder: NSCoder) {
-    self.actionButtonConfig = .init()
+    self.uiConfig = .init(
+      titleConfig: .init(savingTitle: "Saving", generatingTitle: "Generating video...", generatedTitle: "Your vide is ready"),
+      primaryActionConfig: .init(),
+      secondaryActionConfig: .init(buttonTitle: "Save to gallery")
+    )
     let superTitleAttributes: TextOverlayConfig.TextAttributes = [
       .font: UIFont.systemFont(ofSize: 40),
       .foregroundColor: UIColor.white,
@@ -96,11 +106,6 @@ public final class ClipMakerController: UIViewController {
     self.viewModel = .init(dataContext: dataContext)
     super.init(coder: coder)
   }
-  // MARK: - Essentials
-  private let editor = ClipMaker()
-
-  private let composerQueue = DispatchQueue(label: "video.composing.queue", attributes: .concurrent)
-  private let videoEditorQueue = DispatchQueue(label: "video.editor.queue", attributes: .concurrent)
 
   // MARK: - UI
   private var player: AVPlayer?
@@ -116,9 +121,11 @@ public final class ClipMakerController: UIViewController {
     return view
   }()
 
-  lazy private var generateButton: UIButton = UIButton(frame: .zero)
-
   lazy private var actionButton = ActionButton(self.actionButtonConfig)
+
+  private var line: UIView = UIView(frame: .zero)
+
+  lazy private var secondaryActionButton = ActionButton(self.secondaryActionButtonConfig)
 
   // MARK: - Life cycle
   override public func viewDidLoad() {
@@ -127,10 +134,15 @@ public final class ClipMakerController: UIViewController {
     self.videoView.center = self.view.center
     self.view.addSubview(self.videoView)
     self.view.addSubview(self.actionButton)
+    self.view.addSubview(self.line)
+    self.view.addSubview(self.secondaryActionButton)
     self.setupLayout()
-    self.generateButton.addTarget(self, action: #selector(self.didTapActionButton), for: .touchUpInside)
+
     self.actionButton.tapHandler = { [weak self] in
       self?.viewModel.generateVideo()
+    }
+    self.secondaryActionButton.tapHandler = { [weak self] in
+      self?.viewModel.secondaryAction()
     }
     self.navigationItem.rightBarButtonItem = UIBarButtonItem(
       barButtonSystemItem: .save,
@@ -207,6 +219,14 @@ public final class ClipMakerController: UIViewController {
   private func didTapSave() {
     self.viewModel.saveVideo()
   }
+
+  public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+    return .portrait
+  }
+
+  public override var shouldAutorotate: Bool {
+    return false
+  }
 }
 
 private extension ClipMakerController {
@@ -220,6 +240,8 @@ private extension ClipMakerController {
   }
 
   func setupLayout() {
+    self.line.backgroundColor = UIColor(red: 224.0/255, green: 224.0/255, blue: 224.0/255, alpha: 1)
+
     self.videoView.translatesAutoresizingMaskIntoConstraints = false
     self.videoView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     self.videoView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
@@ -227,10 +249,25 @@ private extension ClipMakerController {
     self.videoView.topAnchor.constraint(equalTo: self.view.layoutMarginsGuide.topAnchor, constant: 20).isActive = true
 
     self.actionButton.translatesAutoresizingMaskIntoConstraints = false
+    self.actionButton.translatesAutoresizingMaskIntoConstraints = false
     self.actionButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
     self.actionButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
     self.actionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-    self.actionButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30).isActive = true
+    self.actionButton.topAnchor.constraint(equalTo: self.videoView.bottomAnchor, constant: 4).isActive = true
+
+    self.line.translatesAutoresizingMaskIntoConstraints = false
+    self.line.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
+    self.line.heightAnchor.constraint(equalToConstant: 0.3).isActive = true
+    self.line.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+    self.line.topAnchor.constraint(equalTo: self.actionButton.bottomAnchor, constant: 0).isActive = true
+
+    self.secondaryActionButton.translatesAutoresizingMaskIntoConstraints = false
+    self.secondaryActionButton.translatesAutoresizingMaskIntoConstraints = false
+    self.secondaryActionButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+    self.secondaryActionButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true
+    self.secondaryActionButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+    self.secondaryActionButton.topAnchor.constraint(equalTo: self.line.bottomAnchor, constant: 0).isActive = true
+
   }
 
   func showVideo(url: URL) {
@@ -243,5 +280,35 @@ private extension ClipMakerController {
     playerLayer.frame = self.videoView.bounds
     self.videoView.layer.addSublayer(playerLayer)
     player.play()
+  }
+}
+
+extension ClipMakerController: ClipMakerViewModelOutput {
+  public func didChangeState(_ state: ClipMakerViewModel.State) {
+    switch state {
+    case .initial:
+      break
+    case .generating:
+      self.title = "Generating video..."
+      break
+    case .generated(let url):
+      break
+    case .saving:
+      break
+    case .saved:
+      break
+    case .failed(let error):
+      let alert = UIAlertController(
+        title: "Oops!",
+        message: error.localizedDescription,
+        preferredStyle: .alert
+      )
+
+      let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+
+      alert.addAction(okAction)
+
+      self.present(alert, animated: true, completion: nil)
+    }
   }
 }

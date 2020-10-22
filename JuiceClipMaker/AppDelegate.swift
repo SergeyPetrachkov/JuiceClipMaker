@@ -77,13 +77,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       ],
       textOverlays: texts
     )
-    let makerModule = ClipMakerModuleAssembly.createModule(actionButtonConfig: .init(), dataContext: context)
+    let uiConfig = ClipMakerUIConfig(
+      titleConfig: .init(savingTitle: "Saving", generatingTitle: "Generating video...", generatedTitle: "Your vide is ready"),
+      primaryActionConfig: .init(),
+      secondaryActionConfig: .init(buttonTitle: "Save to gallery")
+    )
+    let makerModule = ClipMakerModuleAssembly.createModule(uiConfig: uiConfig, dataContext: context)
     makerModule.view.title = "Clip Maker"
     let navController = UINavigationController(
       rootViewController: makerModule.view
     )
 
-    window.rootViewController = navController
+    window.rootViewController = makerModule.view
     window.makeKeyAndVisible()
     self.window = window
     return true
