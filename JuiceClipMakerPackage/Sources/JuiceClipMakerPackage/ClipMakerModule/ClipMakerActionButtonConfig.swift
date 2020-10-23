@@ -46,7 +46,19 @@ public struct ClipMakerActionButtonConfig {
 }
 
 public struct ClipMakerUIConfig {
-  let titleConfig: TitleConfig
-  let primaryActionConfig: ClipMakerActionButtonConfig
-  let secondaryActionConfig: ClipMakerActionButtonConfig
+
+  public let titleConfig: TitleConfig
+  public let primaryActionConfig: ClipMakerActionButtonConfig
+  public let secondaryActionConfig: ClipMakerActionButtonConfig
+  public let shareActionConfig: ClipMakerActionButtonConfig
+
+  public init(titleConfig: TitleConfig,
+              primaryActionConfig: ClipMakerActionButtonConfig,
+              secondaryActionConfig: ClipMakerActionButtonConfig,
+              shareActionConfig: ClipMakerActionButtonConfig) {
+    self.titleConfig = titleConfig
+    self.primaryActionConfig = primaryActionConfig
+    self.secondaryActionConfig = secondaryActionConfig
+    self.shareActionConfig = shareActionConfig
+  }
 }

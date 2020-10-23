@@ -3,43 +3,25 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A515FDDC2531CD0F00106789 /* MergeVideos.swift in Sources */ = {isa = PBXBuildFile; fileRef = A515FDDB2531CD0F00106789 /* MergeVideos.swift */; };
-		A56136BC2535B3260037A899 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56136BB2535B3260037A899 /* TextOverlay.swift */; };
-		A570747E2531CA6100301B11 /* VideoDecorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A570747D2531CA6100301B11 /* VideoDecorator.swift */; };
-		A57D6800253F01A100A49E5B /* ClipMakerActionButtonConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57D67FF253F01A100A49E5B /* ClipMakerActionButtonConfig.swift */; };
-		A57D6803253F01BE00A49E5B /* ClipMakerContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57D6802253F01BE00A49E5B /* ClipMakerContext.swift */; };
-		A57D6806253F020300A49E5B /* ClipMakerModuleAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57D6805253F020300A49E5B /* ClipMakerModuleAssembly.swift */; };
-		A57D680C253F047E00A49E5B /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A57D680B253F047E00A49E5B /* ActionButton.swift */; };
-		A5827A612531B2A8004AD9B6 /* ClipMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5827A602531B2A8004AD9B6 /* ClipMaker.swift */; };
+		A558A39E2542F25D007E9ADB /* JuiceClipMakerPackage in Frameworks */ = {isa = PBXBuildFile; productRef = A558A39D2542F25D007E9ADB /* JuiceClipMakerPackage */; };
 		A5AAB0672530654B00FC164D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AAB0662530654B00FC164D /* AppDelegate.swift */; };
-		A5AAB06B2530654B00FC164D /* ClipMakerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AAB06A2530654B00FC164D /* ClipMakerController.swift */; };
 		A5AAB06E2530654B00FC164D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06C2530654B00FC164D /* Main.storyboard */; };
 		A5AAB0702530654D00FC164D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB06F2530654D00FC164D /* Assets.xcassets */; };
 		A5AAB0732530654D00FC164D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A5AAB0712530654D00FC164D /* LaunchScreen.storyboard */; };
-		A5F1C8A225406167001008A0 /* ClipMakerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A515FDDB2531CD0F00106789 /* MergeVideos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeVideos.swift; sourceTree = "<group>"; };
-		A56136BB2535B3260037A899 /* TextOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlay.swift; sourceTree = "<group>"; };
-		A570747D2531CA6100301B11 /* VideoDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDecorator.swift; sourceTree = "<group>"; };
-		A57D67FF253F01A100A49E5B /* ClipMakerActionButtonConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerActionButtonConfig.swift; sourceTree = "<group>"; };
-		A57D6802253F01BE00A49E5B /* ClipMakerContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerContext.swift; sourceTree = "<group>"; };
-		A57D6805253F020300A49E5B /* ClipMakerModuleAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerModuleAssembly.swift; sourceTree = "<group>"; };
-		A57D680B253F047E00A49E5B /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
-		A5827A602531B2A8004AD9B6 /* ClipMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMaker.swift; sourceTree = "<group>"; };
+		A558A3992542F108007E9ADB /* JuiceClipMakerPackage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JuiceClipMakerPackage; sourceTree = "<group>"; };
 		A5AAB0632530654B00FC164D /* JuiceClipMaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JuiceClipMaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5AAB0662530654B00FC164D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A5AAB06A2530654B00FC164D /* ClipMakerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerController.swift; sourceTree = "<group>"; };
 		A5AAB06D2530654B00FC164D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A5AAB06F2530654D00FC164D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A5AAB0722530654D00FC164D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A5AAB0742530654D00FC164D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipMakerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,48 +29,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A558A39E2542F25D007E9ADB /* JuiceClipMakerPackage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A570747C2531CA4D00301B11 /* ClipMaker */ = {
+		A558A39C2542F25D007E9ADB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A5827A602531B2A8004AD9B6 /* ClipMaker.swift */,
-				A570747D2531CA6100301B11 /* VideoDecorator.swift */,
-				A515FDDB2531CD0F00106789 /* MergeVideos.swift */,
-				A56136BB2535B3260037A899 /* TextOverlay.swift */,
 			);
-			path = ClipMaker;
-			sourceTree = "<group>";
-		};
-		A57D67FE253F019200A49E5B /* ClipMakerModule */ = {
-			isa = PBXGroup;
-			children = (
-				A5AAB06A2530654B00FC164D /* ClipMakerController.swift */,
-				A57D67FF253F01A100A49E5B /* ClipMakerActionButtonConfig.swift */,
-				A57D6802253F01BE00A49E5B /* ClipMakerContext.swift */,
-				A57D6805253F020300A49E5B /* ClipMakerModuleAssembly.swift */,
-				A5F1C8A125406167001008A0 /* ClipMakerViewModel.swift */,
-			);
-			path = ClipMakerModule;
-			sourceTree = "<group>";
-		};
-		A57D680A253F046E00A49E5B /* ActionButton */ = {
-			isa = PBXGroup;
-			children = (
-				A57D680B253F047E00A49E5B /* ActionButton.swift */,
-			);
-			path = ActionButton;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A5AAB05A2530654B00FC164D = {
 			isa = PBXGroup;
 			children = (
+				A558A3992542F108007E9ADB /* JuiceClipMakerPackage */,
 				A5AAB0652530654B00FC164D /* JuiceClipMaker */,
 				A5AAB0642530654B00FC164D /* Products */,
+				A558A39C2542F25D007E9ADB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,9 +64,6 @@
 		A5AAB0652530654B00FC164D /* JuiceClipMaker */ = {
 			isa = PBXGroup;
 			children = (
-				A57D680A253F046E00A49E5B /* ActionButton */,
-				A57D67FE253F019200A49E5B /* ClipMakerModule */,
-				A570747C2531CA4D00301B11 /* ClipMaker */,
 				A5AAB0662530654B00FC164D /* AppDelegate.swift */,
 				A5AAB06C2530654B00FC164D /* Main.storyboard */,
 				A5AAB06F2530654D00FC164D /* Assets.xcassets */,
@@ -132,6 +90,7 @@
 			);
 			name = JuiceClipMaker;
 			packageProductDependencies = (
+				A558A39D2542F25D007E9ADB /* JuiceClipMakerPackage */,
 			);
 			productName = JuiceClipMaker;
 			productReference = A5AAB0632530654B00FC164D /* JuiceClipMaker.app */;
@@ -189,17 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A5AAB06B2530654B00FC164D /* ClipMakerController.swift in Sources */,
-				A515FDDC2531CD0F00106789 /* MergeVideos.swift in Sources */,
-				A570747E2531CA6100301B11 /* VideoDecorator.swift in Sources */,
-				A5F1C8A225406167001008A0 /* ClipMakerViewModel.swift in Sources */,
-				A57D6800253F01A100A49E5B /* ClipMakerActionButtonConfig.swift in Sources */,
-				A57D6806253F020300A49E5B /* ClipMakerModuleAssembly.swift in Sources */,
-				A56136BC2535B3260037A899 /* TextOverlay.swift in Sources */,
-				A5827A612531B2A8004AD9B6 /* ClipMaker.swift in Sources */,
-				A57D6803253F01BE00A49E5B /* ClipMakerContext.swift in Sources */,
 				A5AAB0672530654B00FC164D /* AppDelegate.swift in Sources */,
-				A57D680C253F047E00A49E5B /* ActionButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +352,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A558A39D2542F25D007E9ADB /* JuiceClipMakerPackage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JuiceClipMakerPackage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A5AAB05B2530654B00FC164D /* Project object */;
 }

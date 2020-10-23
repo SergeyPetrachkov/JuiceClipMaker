@@ -25,7 +25,7 @@ public final class ClipMakerController: UIViewController {
   // MARK: - Initializers
   public init(uiConfig: ClipMakerUIConfig, dataContext: ClipMakerContext) {
     self.uiConfig = uiConfig
-    self.viewModel = ClipMakerViewModel(dataContext: dataContext)
+    self.viewModel = ClipMakerViewModel(dataContext: dataContext, startRightAway: false)
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -39,7 +39,8 @@ public final class ClipMakerController: UIViewController {
     self.uiConfig = .init(
       titleConfig: .init(savingTitle: "Saving", generatingTitle: "Generating video...", generatedTitle: "Your vide is ready"),
       primaryActionConfig: .init(),
-      secondaryActionConfig: .init(buttonTitle: "Save to gallery")
+      secondaryActionConfig: .init(buttonTitle: "Save to gallery"),
+      shareActionConfig: .init(buttonTitle: "Share")
     )
     let superTitleAttributes: TextOverlayConfig.TextAttributes = [
       .font: UIFont.systemFont(ofSize: 40),
@@ -104,7 +105,7 @@ public final class ClipMakerController: UIViewController {
       ],
       textOverlays: texts
     )
-    self.viewModel = .init(dataContext: dataContext)
+    self.viewModel = .init(dataContext: dataContext, startRightAway: false)
     super.init(coder: coder)
   }
 
@@ -141,7 +142,7 @@ public final class ClipMakerController: UIViewController {
     self.setupLayout()
 
     self.actionButton.tapHandler = { [weak self] in
-      self?.viewModel.generateVideo()
+      self?.viewModel.primaryAction()
     }
     self.secondaryActionButton.tapHandler = { [weak self] in
       self?.viewModel.secondaryAction()
@@ -151,32 +152,7 @@ public final class ClipMakerController: UIViewController {
       target: self,
       action: #selector(self.didTapSave)
     )
-
-//    self.viewModel.didStartMakingVideo = { [weak self] in
-//      self?.actionButton.enterPendingState()
-//    }
-
-//    self.viewModel.didFinishMakingVideo = { [weak self] result in
-//
-//    }
-
-//    self.viewModel.didSaveVideo = { [weak self] in
-//
-//    }
-
-    self.viewModel.didFailToSaveVideo = { [weak self] in
-      guard let self = self else {
-        return
-      }
-      let alert = UIAlertController(
-        title: "Nothing to save!",
-        message: "Press generate and wait for a video to appear.",
-        preferredStyle: .alert
-      )
-      let ok = UIAlertAction(title: "Ok", style: .default, handler: nil)
-      alert.addAction(ok)
-      self.present(alert, animated: true, completion: nil)
-    }
+    self.viewModel.start()
   }
 
   // MARK: - Actions
@@ -282,6 +258,7 @@ extension ClipMakerController: ClipMakerViewModelOutput {
     case .generating:
       self.title = "Generating video..."
       self.enterPendingState()
+      self.actionButton.setup(with: self.uiConfig.shareActionConfig)
       self.actionButton.disable()
       self.secondaryActionButton.disable()
     case .generated(let url):
@@ -308,6 +285,10 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       self.actionButton.enable()
       self.secondaryActionButton.enable()
     }
+  }
+
+  public weak var viewContext: UIViewController? {
+    return self
   }
 }
 

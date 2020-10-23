@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import JuiceClipMakerPackage
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -79,16 +80,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       textOverlays: texts
     )
     let uiConfig = ClipMakerUIConfig(
-      titleConfig: .init(savingTitle: "Saving", generatingTitle: "Generating video...", generatedTitle: "Your vide is ready"),
+      titleConfig: .init(savingTitle: "Saving", generatingTitle: "Generating video...", generatedTitle: "Your video is ready"),
       primaryActionConfig: .init(),
-      secondaryActionConfig: .init(buttonTitle: "Save to gallery")
+      secondaryActionConfig: .init(buttonTitle: "Save to gallery"),
+      shareActionConfig: .init(buttonTitle: "Share")
     )
     let makerModule = ClipMakerModuleAssembly.createModule(uiConfig: uiConfig, dataContext: context)
     makerModule.view.title = "Clip Maker"
-    let navController = UINavigationController(
-      rootViewController: makerModule.view
-    )
-
     window.rootViewController = makerModule.view
     window.makeKeyAndVisible()
     self.window = window

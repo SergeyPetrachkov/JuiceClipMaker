@@ -9,7 +9,7 @@ import UIKit
 
 final class ActionButton: UIButton {
 
-  let config: ClipMakerActionButtonConfig
+  private(set) var config: ClipMakerActionButtonConfig
   var tapHandler: (() -> Void)? = nil
 
   lazy var activityIndicator: UIActivityIndicatorView = {
@@ -22,16 +22,21 @@ final class ActionButton: UIButton {
     self.config = config
     super.init(frame: .zero)
     self.addTarget(self, action: #selector(self.didTapSelf), for: .touchUpInside)
-    self.layer.cornerRadius = self.config.cornerRadius
     self.clipsToBounds = true
-    self.setTitle(self.config.buttonTitle, for: .normal)
-    self.setTitleColor(self.config.buttonTitleColor, for: .normal)
-    self.setTitleColor(.gray, for: .disabled)
-    self.setBackgroundImage(UIImage.from(color: self.config.buttonBackground), for: .normal)
+    self.setup(with: config)
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  public func setup(with config: ClipMakerActionButtonConfig) {
+    self.layer.cornerRadius = config.cornerRadius
+    self.setTitle(config.buttonTitle, for: .normal)
+    self.setTitleColor(config.buttonTitleColor, for: .normal)
+    self.setTitleColor(.gray, for: .disabled)
+    self.setBackgroundImage(UIImage.from(color: config.buttonBackground), for: .normal)
+    self.config = config
   }
 
   @objc

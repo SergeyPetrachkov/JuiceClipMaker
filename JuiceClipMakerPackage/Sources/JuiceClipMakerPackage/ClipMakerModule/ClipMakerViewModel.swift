@@ -9,9 +9,9 @@ import AVKit
 import Foundation
 import Photos
 
-
 public protocol ClipMakerViewModelOutput: AnyObject {
   func didChangeState(_ state: ClipMakerViewModel.State)
+  var viewContext: UIViewController? { get }
 }
 
 public final class ClipMakerViewModel {
@@ -31,6 +31,7 @@ public final class ClipMakerViewModel {
   public var didFinishMakingVideo: ((Result<URL, Error>) -> Void)?
   public var didSaveVideo: (() -> Void)?
   public var didFailToSaveVideo: (() -> Void)?
+  public var didFinishFlow: (() -> Void)?
 
   public weak var output: ClipMakerViewModelOutput? {
     didSet {
@@ -51,9 +52,12 @@ public final class ClipMakerViewModel {
   private let composerQueue = DispatchQueue(label: "video.composing.queue", attributes: .concurrent)
   private let videoEditorQueue = DispatchQueue(label: "video.editor.queue", attributes: .concurrent)
 
+  private let shouldStartRightAway: Bool
+
   // MARK: - Initializers
-  public init(dataContext: ClipMakerContext) {
+  public init(dataContext: ClipMakerContext, startRightAway: Bool) {
     self.dataContext = dataContext
+    self.shouldStartRightAway = startRightAway
     if let placeholder = self.dataContext.placeholder {
       let url = URL(string: placeholder)
       self.state = .initial(url)
@@ -62,12 +66,29 @@ public final class ClipMakerViewModel {
     }
   }
 
-  public func primaryAction() {
+  func start() {
+    if self.shouldStartRightAway {
+      self.generateVideo()
+    }
+  }
 
+  func stop() {
+    
+  }
+
+  public func primaryAction() {
+    switch state {
+    case .initial, .failed:
+      self.generateVideo()
+    case .generated(let url):
+      self.shareVideo(url: url)
+    case .generating, .saving, .saved:
+      break
+    }
   }
 
   public func secondaryAction() {
-
+    self.saveVideo()
   }
 
   public func generateVideo() {
@@ -85,15 +106,30 @@ public final class ClipMakerViewModel {
         }
 
       self.editor.mergeVideos(urls: videos) { [weak self] result in
+        guard let self = self else { return }
         switch result {
         case .success(let url):
-          self?.state = .generated(url)
+          if self.cancelled {
+            self.deleteVideo(url: url)
+            return
+          }
+          self.state = .generated(url)
         case .failure(let error):
-          self?.state = .failed(error)
+          self.state = .failed(error)
         }
-        self?.didFinishMakingVideo?(result)
+        if self.cancelled {
+          NSLog("Cancelled clip maker")
+        } else {
+          self.didFinishMakingVideo?(result)
+        }
       }
     }
+  }
+
+  private var cancelled: Bool = false
+  public func close() {
+    self.cancelled = true
+    self.didFinishFlow?()
   }
 
   public func saveVideo() {
@@ -115,6 +151,19 @@ public final class ClipMakerViewModel {
     }
   }
 
+  private func shareVideo(url: URL) {
+    guard let viewContext = self.output?.viewContext else {
+      return
+    }
+    let sharingVC = UIActivityViewController(activityItems: [url], applicationActivities: [])
+
+    sharingVC.completionWithItemsHandler = { [weak self] _,_,_,_ in
+      self?.didFinishFlow?()
+    }
+
+    viewContext.present(sharingVC, animated: true, completion: nil)
+  }
+
   private func processVideo(at url: URL, textOverlay: TextOverlayConfig, on queue: DispatchQueue) -> URL {
     var resultUrl: URL?
     let dispatchGroup = DispatchGroup()
@@ -127,5 +176,9 @@ public final class ClipMakerViewModel {
     }
     dispatchGroup.wait()
     return resultUrl ?? url
+  }
+
+  private func deleteVideo(url: URL) {
+    try? FileManager.default.removeItem(at: url)
   }
 }
