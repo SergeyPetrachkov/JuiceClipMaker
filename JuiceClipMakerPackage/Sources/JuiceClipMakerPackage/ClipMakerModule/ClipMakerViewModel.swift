@@ -104,8 +104,14 @@ public final class ClipMakerViewModel {
             on: self.videoEditorQueue
           )
         }
-
-      self.editor.mergeVideos(urls: videos) { [weak self] result in
+      videos.forEach { video in
+        PHPhotoLibrary.shared().performChanges({
+          PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: video)
+        }) { saved, error in
+          print("saved \(video)")
+        }
+      }
+      mergeMovies(videoURLs: videos) { [weak self] result in
         guard let self = self else { return }
         switch result {
         case .success(let url):

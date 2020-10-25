@@ -67,6 +67,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
                     .init(string: "Sets 2", attributes: bodyAttributes)]
       ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
+      TextOverlayConfig(
+        title: .init(string: "Pull-ups", attributes: titleAttributes),
+        bodyLines: [.init(string: "Reps 7", attributes: bodyAttributes),
+                    .init(string: "Sets 2", attributes: bodyAttributes)]
+      ),
     ]
     let context = ClipMakerContext(
       placeholder: "https://juiceapp.cc/storage/videos/2936/KqpwfYBMN72J8CYVDhM1Q4UU4RtNSf.jpg",
@@ -75,6 +105,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         "https://juiceapp.cc/storage/videos/2936/praQXLAzWG4xCKMn7bi75glvrSbuYT.mp4",
         "https://juiceapp.cc/storage/videos/2936/BS1lFFZUa4j6nfES6WsZ2mgJr9LtgL.mp4",
         "https://juiceapp.cc/storage/videos/2936/13rb3QPu5tyhqRNyd5PuEMOa6FD8LW.mp4",
+        "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4",
+        "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4",
+        "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4",
+        "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4",
+        "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4",
         "https://juiceapp.cc/storage/videos/2936/sxS9mSHqPQFj9KFlNcLxwLZj5jmQJq.mp4"
       ],
       textOverlays: texts

@@ -8,62 +8,117 @@
 import Foundation
 import AVKit
 
-extension AVMutableComposition {
+/// Method to merge multiple videos
+///
+/// - Parameters:
+///   - videoURLs: the videos to merge URLs
+///   - fileName: the name of the finished merged video file
+///   - completion: either url to the resulting video or a failure reason as an Error
+func mergeMovies(videoURLs: [URL], filename: String = UUID().uuidString, completion: @escaping (Result<URL, Error>) -> Void) {
+  let acceptableVideoExtensions = ["mov", "mp4", "m4v"]
+  let _videoURLs = videoURLs.filter({ !$0.absoluteString.contains(".DS_Store") && acceptableVideoExtensions.contains($0.pathExtension.lowercased()) })
 
-
-  static func instruction(_ assetTrack: AVAssetTrack,
-                          asset: AVAsset,
-                          time: CMTime,
-                          duration: CMTime,
-                          maxRenderSize: CGSize) -> (videoCompositionInstruction: AVMutableVideoCompositionInstruction,
-                                                     isPortrait: Bool) {
-    let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: assetTrack)
-
-    // Find out orientation from preffered transform.
-    let assetInfo = orientationFromTransform(assetTrack.preferredTransform)
-
-    // Calculate scale ratio according orientation.
-    var scaleRatio = maxRenderSize.width / assetTrack.naturalSize.width
-    if assetInfo.isPortrait {
-      scaleRatio = maxRenderSize.height / assetTrack.naturalSize.height
+  /// guard against missing URLs
+  guard !_videoURLs.isEmpty else {
+    DispatchQueue.main.async {
+      completion(.failure(Errors.assetError))
     }
-
-    // Set correct transform.
-    var transform = CGAffineTransform(scaleX: scaleRatio, y: scaleRatio)
-    transform = assetTrack.preferredTransform.concatenating(transform)
-    layerInstruction.setTransform(transform, at: .zero)
-
-    // Create Composition Instruction and pass Layer Instruction to it.
-    let videoCompositionInstruction = AVMutableVideoCompositionInstruction()
-    videoCompositionInstruction.timeRange = CMTimeRangeMake(start: time, duration: duration)
-    videoCompositionInstruction.layerInstructions = [layerInstruction]
-
-    return (videoCompositionInstruction, assetInfo.isPortrait)
+    return
   }
 
-  static func orientationFromTransform(_ transform: CGAffineTransform) -> (orientation: UIImage.Orientation, isPortrait: Bool) {
-    var assetOrientation = UIImage.Orientation.up
-    var isPortrait = false
+  var videoAssets: [AVURLAsset] = []
+  var completeMoviePath: URL?
 
-    switch [transform.a, transform.b, transform.c, transform.d] {
-    case [0.0, 1.0, -1.0, 0.0]:
-      assetOrientation = .right
-      isPortrait = true
-
-    case [0.0, -1.0, 1.0, 0.0]:
-      assetOrientation = .left
-      isPortrait = true
-
-    case [1.0, 0.0, 0.0, 1.0]:
-      assetOrientation = .up
-
-    case [-1.0, 0.0, 0.0, -1.0]:
-      assetOrientation = .down
-
-    default:
-      break
+  for path in _videoURLs {
+    if let _url = URL(string: path.absoluteString) {
+      videoAssets.append(AVURLAsset(url: _url))
     }
+  }
 
-    return (assetOrientation, isPortrait)
+  if let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
+    completeMoviePath = URL(fileURLWithPath: documentsPath).appendingPathComponent("\(filename).mp4")
+
+    if let completeMoviePath = completeMoviePath {
+      if FileManager.default.fileExists(atPath: completeMoviePath.path) {
+        do {
+          /// delete an old duplicate file
+          try FileManager.default.removeItem(at: completeMoviePath)
+        } catch {
+          DispatchQueue.main.async {
+            completion(.failure(error))
+          }
+        }
+      }
+    }
+  } else {
+    DispatchQueue.main.async {
+      completion(.failure(Errors.exportError))
+    }
+  }
+
+  let composition = AVMutableComposition()
+
+  if let completeMoviePath = completeMoviePath {
+
+    /// add audio and video tracks to the composition
+    if let videoTrack: AVMutableCompositionTrack = composition.addMutableTrack(withMediaType: AVMediaType.video, preferredTrackID: kCMPersistentTrackID_Invalid), let audioTrack: AVMutableCompositionTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+
+      var insertTime = CMTime(seconds: 0, preferredTimescale: 1)
+
+      /// for each URL add the video and audio tracks and their duration to the composition
+      for sourceAsset in videoAssets {
+        do {
+          if let assetVideoTrack = sourceAsset.tracks(withMediaType: .video).first, let assetAudioTrack = sourceAsset.tracks(withMediaType: .audio).first {
+            let frameRange = CMTimeRange(start: CMTime(seconds: 0, preferredTimescale: 1), duration: sourceAsset.duration)
+            try videoTrack.insertTimeRange(frameRange, of: assetVideoTrack, at: insertTime)
+            try audioTrack.insertTimeRange(frameRange, of: assetAudioTrack, at: insertTime)
+
+            videoTrack.preferredTransform = assetVideoTrack.preferredTransform
+          }
+
+          insertTime = insertTime + sourceAsset.duration
+        } catch {
+          DispatchQueue.main.async {
+            completion(.failure(error))
+          }
+        }
+      }
+
+      /// try to start an export session and set the path and file type
+      if let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetPassthrough) {
+        exportSession.outputURL = completeMoviePath
+        exportSession.outputFileType = AVFileType.mp4
+        exportSession.shouldOptimizeForNetworkUse = true
+
+        /// try to export the file and handle the status cases
+        exportSession.exportAsynchronously(completionHandler: {
+          switch exportSession.status {
+          case .failed:
+            if let _error = exportSession.error {
+              DispatchQueue.main.async {
+                completion(.failure(_error))
+              }
+            }
+
+          case .cancelled:
+            if let _error = exportSession.error {
+              DispatchQueue.main.async {
+                completion(.failure(_error))
+              }
+            }
+
+          default:
+            print("finished")
+            DispatchQueue.main.async {
+              completion(.success(completeMoviePath))
+            }
+          }
+        })
+      } else {
+        DispatchQueue.main.async {
+          completion(.failure(Errors.exportSessionCreationError))
+        }
+      }
+    }
   }
 }
