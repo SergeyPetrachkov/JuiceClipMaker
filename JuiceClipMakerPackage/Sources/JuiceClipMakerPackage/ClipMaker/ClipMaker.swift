@@ -331,9 +331,10 @@ class ClipMaker: VideoDecorator {
     }
 
     // MARK: - Calculate text sizes
+    let width: CGFloat = videoSize.width - 60
     let titleSize = textOverlay.title.boundingRect(
-      with: videoSize,
-      options: .usesFontLeading,
+      with: CGSize(width: width, height: videoSize.height),
+      options: .usesLineFragmentOrigin,
       context: nil
     )
 
@@ -409,7 +410,8 @@ class ClipMaker: VideoDecorator {
     let titleLayer = CATextLayer()
     titleLayer.string = textOverlay.title
     titleLayer.backgroundColor = UIColor.clear.cgColor
-    titleLayer.alignmentMode = .center
+    titleLayer.alignmentMode = .left
+    titleLayer.isWrapped = true
 
     titleLayer.frame = CGRect(
       x: xOrigin,
