@@ -53,11 +53,13 @@ public final class ClipMakerViewModel {
   private let videoEditorQueue = DispatchQueue(label: "video.editor.queue", attributes: .concurrent)
 
   private let shouldStartRightAway: Bool
+  private let saveIntermediateVideos: Bool
 
   // MARK: - Initializers
-  public init(dataContext: ClipMakerContext, startRightAway: Bool) {
+  public init(dataContext: ClipMakerContext, startRightAway: Bool, saveIntermediateVideos: Bool) {
     self.dataContext = dataContext
     self.shouldStartRightAway = startRightAway
+    self.saveIntermediateVideos = saveIntermediateVideos
     if let placeholder = self.dataContext.placeholder {
       let url = URL(string: placeholder)
       self.state = .initial(url)
@@ -104,11 +106,13 @@ public final class ClipMakerViewModel {
             on: self.videoEditorQueue
           )
         }
-      videos.forEach { video in
-        PHPhotoLibrary.shared().performChanges({
-          PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: video)
-        }) { saved, error in
-          print("saved \(video)")
+      if self.saveIntermediateVideos {
+        videos.forEach { video in
+          PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: video)
+          }) { saved, error in
+            print("saved \(video)")
+          }
         }
       }
       mergeMovies(videoURLs: videos) { [weak self] result in

@@ -25,7 +25,7 @@ public final class ClipMakerController: UIViewController {
   // MARK: - Initializers
   public init(uiConfig: ClipMakerUIConfig, dataContext: ClipMakerContext) {
     self.uiConfig = uiConfig
-    self.viewModel = ClipMakerViewModel(dataContext: dataContext, startRightAway: false)
+    self.viewModel = ClipMakerViewModel(dataContext: dataContext, startRightAway: false, saveIntermediateVideos: false)
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -105,7 +105,7 @@ public final class ClipMakerController: UIViewController {
       ],
       textOverlays: texts
     )
-    self.viewModel = .init(dataContext: dataContext, startRightAway: false)
+    self.viewModel = .init(dataContext: dataContext, startRightAway: false, saveIntermediateVideos: false)
     super.init(coder: coder)
   }
 
