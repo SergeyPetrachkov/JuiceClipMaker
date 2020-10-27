@@ -309,6 +309,7 @@ class ClipMaker: VideoDecorator {
       superTitleLayer.alignmentMode = .center
       superTitleLayer.opacity = 0
       superTitleLayer.isWrapped = true
+      superTitleLayer.contentsScale = UIScreen.main.scale
       superTitleLayer.frame = CGRect(
         origin: CGPoint(x: 20, y: yPosition),
         size: CGSize(width: videoSize.width - 40, height: superTitleSize.height)
@@ -412,6 +413,7 @@ class ClipMaker: VideoDecorator {
     titleLayer.backgroundColor = UIColor.clear.cgColor
     titleLayer.alignmentMode = .left
     titleLayer.isWrapped = true
+    titleLayer.contentsScale = UIScreen.main.scale
 
     titleLayer.frame = CGRect(
       x: xOrigin,
@@ -448,6 +450,7 @@ class ClipMaker: VideoDecorator {
       textLayer.cornerRadius = 4
       textLayer.alignmentMode = .center
       textLayer.opacity = 0
+      textLayer.contentsScale = UIScreen.main.scale
       textLayer.frame = CGRect(
         x: 30,
         y: yPosition,
