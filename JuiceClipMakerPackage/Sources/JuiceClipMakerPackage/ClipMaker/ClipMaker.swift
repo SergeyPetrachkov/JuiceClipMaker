@@ -423,7 +423,7 @@ class ClipMaker: VideoDecorator {
     // MARK: - title layer slide from the left
     let frameAnimation = CABasicAnimation(keyPath: "position.x")
     frameAnimation.fromValue = xOrigin
-    frameAnimation.toValue = titleSize.width/2 + 46
+    frameAnimation.toValue = titleSize.width/2 + 56
     frameAnimation.duration = 0.8
     frameAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
     frameAnimation.beginTime = superTitleTiming

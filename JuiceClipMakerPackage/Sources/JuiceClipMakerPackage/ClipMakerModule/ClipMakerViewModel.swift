@@ -68,10 +68,22 @@ public final class ClipMakerViewModel {
     }
   }
 
-  func start() {
-    if self.shouldStartRightAway {
-      self.generateVideo()
-    }
+  public func start() {
+    #if targetEnvironment(simulator)
+    let alert = UIAlertController(
+      title: "Oops!",
+      message: "This can't be run on a simulator! Use your device instead.",
+      preferredStyle: .alert
+    )
+
+    let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+
+    alert.addAction(okAction)
+
+    self.output?.viewContext?.present(alert, animated: true, completion: nil)
+    #else
+    self.generateVideo()
+    #endif
   }
 
   func stop() {
@@ -115,11 +127,15 @@ public final class ClipMakerViewModel {
           }
         }
       }
+      if self.cancelled {
+        return
+      }
       mergeMovies(videoURLs: videos) { [weak self] result in
         guard let self = self else { return }
         switch result {
         case .success(let url):
           if self.cancelled {
+            NSLog("\(self):: was cancelled, will delete video at url: \(url) now")
             self.deleteVideo(url: url)
             return
           }
@@ -138,8 +154,15 @@ public final class ClipMakerViewModel {
 
   private var cancelled: Bool = false
   public func close() {
+    NSLog("\(self):: cancel(), will delete video if needed")
     self.cancelled = true
     self.didFinishFlow?()
+
+    guard case State.generated(let url) = self.state else {
+      return
+    }
+    NSLog("\(self):: cancel(), will try delete video now")
+    self.deleteVideo(url: url)
   }
 
   public func saveVideo() {
@@ -189,6 +212,7 @@ public final class ClipMakerViewModel {
   }
 
   private func deleteVideo(url: URL) {
+    NSLog("\(self):: deleteVideo(url: \(url)")
     try? FileManager.default.removeItem(at: url)
   }
 }

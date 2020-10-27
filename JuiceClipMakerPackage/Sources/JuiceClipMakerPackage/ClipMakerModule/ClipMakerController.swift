@@ -132,6 +132,11 @@ public final class ClipMakerController: UIViewController {
   }()
 
   // MARK: - Life cycle
+
+  deinit {
+    debugPrint("\(self) deinit")
+  }
+
   override public func viewDidLoad() {
     super.viewDidLoad()
     self.view.backgroundColor = .white
@@ -152,7 +157,6 @@ public final class ClipMakerController: UIViewController {
       target: self,
       action: #selector(self.didTapSave)
     )
-    self.viewModel.start()
   }
 
   // MARK: - Actions
@@ -269,7 +273,8 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       self.actionButton.disable()
       self.secondaryActionButton.disable()
     case .saved:
-      break
+      self.actionButton.enable()
+      self.secondaryActionButton.enable()
     case .failed(let error):
       let alert = UIAlertController(
         title: "Oops!",
