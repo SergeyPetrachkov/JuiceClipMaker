@@ -253,42 +253,55 @@ private extension ClipMakerController {
 
 extension ClipMakerController: ClipMakerViewModelOutput {
   public func didChangeState(_ state: ClipMakerViewModel.State) {
-    switch state {
-    case .initial(let url):
-      guard let url = url else {
-        return
+    DispatchQueue.main.async {
+      switch state {
+      case .initial(let url):
+        guard let url = url else {
+          return
+        }
+        self.videoView.load(url: url)
+      case .generating:
+        self.title = "Generating video..."
+        self.enterPendingState()
+        self.actionButton.setup(with: self.uiConfig.shareActionConfig)
+        self.actionButton.disable()
+        self.secondaryActionButton.disable()
+      case .generated(let url):
+        self.showVideo(url: url)
+        self.actionButton.enable()
+        self.secondaryActionButton.enable()
+      case .saving:
+        self.actionButton.disable()
+        self.secondaryActionButton.disable()
+      case .saved:
+        self.actionButton.enable()
+        self.secondaryActionButton.enable()
+        let alert = UIAlertController(
+          title: "Success!",
+          message: "Your video has been saved!",
+          preferredStyle: .alert
+        )
+
+        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+
+        alert.addAction(okAction)
+
+        self.present(alert, animated: true, completion: nil)
+      case .failed(let error):
+        let alert = UIAlertController(
+          title: "Oops!",
+          message: error.localizedDescription,
+          preferredStyle: .alert
+        )
+
+        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+
+        alert.addAction(okAction)
+
+        self.present(alert, animated: true, completion: nil)
+        self.actionButton.enable()
+        self.secondaryActionButton.enable()
       }
-      self.videoView.load(url: url)
-    case .generating:
-      self.title = "Generating video..."
-      self.enterPendingState()
-      self.actionButton.setup(with: self.uiConfig.shareActionConfig)
-      self.actionButton.disable()
-      self.secondaryActionButton.disable()
-    case .generated(let url):
-      self.showVideo(url: url)
-      self.actionButton.enable()
-      self.secondaryActionButton.enable()
-    case .saving:
-      self.actionButton.disable()
-      self.secondaryActionButton.disable()
-    case .saved:
-      self.actionButton.enable()
-      self.secondaryActionButton.enable()
-    case .failed(let error):
-      let alert = UIAlertController(
-        title: "Oops!",
-        message: error.localizedDescription,
-        preferredStyle: .alert
-      )
-
-      let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-
-      alert.addAction(okAction)
-
-      self.present(alert, animated: true, completion: nil)
-      self.actionButton.enable()
-      self.secondaryActionButton.enable()
     }
   }
 
