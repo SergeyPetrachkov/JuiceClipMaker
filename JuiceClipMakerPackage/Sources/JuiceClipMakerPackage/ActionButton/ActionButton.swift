@@ -34,7 +34,11 @@ final class ActionButton: UIButton {
     self.layer.cornerRadius = config.cornerRadius
     self.setTitle(config.buttonTitle, for: .normal)
     self.setTitleColor(config.buttonTitleColor, for: .normal)
-    self.setTitleColor(.gray, for: .disabled)
+    self.setTitleColor(UIColor(red: 218.0/255,
+                               green: 218.0/255,
+                               blue: 218.0/255,
+                               alpha: 1),
+                       for: .disabled)
     self.setBackgroundImage(UIImage.from(color: config.buttonBackground), for: .normal)
     self.config = config
   }
