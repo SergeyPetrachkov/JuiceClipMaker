@@ -279,17 +279,6 @@ extension ClipMakerController: ClipMakerViewModelOutput {
       case .saved:
         self.actionButton.enable()
         self.secondaryActionButton.enable()
-        let alert = UIAlertController(
-          title: "Success!",
-          message: "Your video has been saved!",
-          preferredStyle: .alert
-        )
-
-        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-
-        alert.addAction(okAction)
-
-        self.present(alert, animated: true, completion: nil)
       case .failed(let error):
         let alert = UIAlertController(
           title: "Oops!",

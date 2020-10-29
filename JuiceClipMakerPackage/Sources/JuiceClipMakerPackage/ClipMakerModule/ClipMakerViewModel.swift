@@ -32,6 +32,8 @@ public final class ClipMakerViewModel {
   public var didSaveVideo: (() -> Void)?
   public var didFailToSaveVideo: (() -> Void)?
   public var didFinishFlow: (() -> Void)?
+  public var didStartSharing: (() -> Void)?
+  public var didShare: (() -> Void)?
 
   public weak var output: ClipMakerViewModelOutput? {
     didSet {
@@ -188,10 +190,12 @@ public final class ClipMakerViewModel {
     guard let viewContext = self.output?.viewContext else {
       return
     }
+    self.didStartSharing?()
     let sharingVC = UIActivityViewController(activityItems: [url], applicationActivities: [])
 
     sharingVC.completionWithItemsHandler = { [weak self] _,_,_,_ in
       self?.didFinishFlow?()
+      self?.didShare?()
     }
 
     viewContext.present(sharingVC, animated: true, completion: nil)
@@ -213,6 +217,11 @@ public final class ClipMakerViewModel {
 
   private func deleteVideo(url: URL) {
     NSLog("\(self):: deleteVideo(url: \(url)")
-    try? FileManager.default.removeItem(at: url)
+    do {
+      try FileManager.default.removeItem(at: url)
+      NSLog("\(self):: deleted video at \(url)")
+    } catch {
+      NSLog("\(error)")
+    }
   }
 }
