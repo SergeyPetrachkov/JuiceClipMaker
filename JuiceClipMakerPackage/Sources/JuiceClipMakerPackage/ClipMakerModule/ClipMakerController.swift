@@ -128,6 +128,7 @@ public final class ClipMakerController: UIViewController {
   lazy var activityIndicator: UIActivityIndicatorView = {
     let style: UIActivityIndicatorView.Style = .whiteLarge
     let view = UIActivityIndicatorView(style: style)
+    view.backgroundColor = UIColor(white: 0, alpha: 0.5)
     return view
   }()
 
@@ -200,6 +201,8 @@ private extension ClipMakerController {
     self.activityIndicator.translatesAutoresizingMaskIntoConstraints = false
     self.activityIndicator.centerXAnchor.constraint(equalTo: self.videoView.centerXAnchor).isActive = true
     self.activityIndicator.centerYAnchor.constraint(equalTo: self.videoView.centerYAnchor).isActive = true
+    self.activityIndicator.widthAnchor.constraint(equalTo: self.videoView.widthAnchor).isActive = true
+    self.activityIndicator.heightAnchor.constraint(equalTo: self.videoView.heightAnchor).isActive = true
     self.activityIndicator.startAnimating()
   }
 
