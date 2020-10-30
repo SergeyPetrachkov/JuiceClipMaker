@@ -12,12 +12,20 @@ import Photos
 public protocol ClipMakerViewModelOutput: AnyObject {
   func didChangeState(_ state: ClipMakerViewModel.State)
   var viewContext: UIViewController? { get }
+  func stop()
 }
 
 public final class ClipMakerViewModel {
+
+  public enum TargetAction {
+    case share
+    case save
+  }
+
   public enum Errors: Swift.Error {
     case noVideo
   }
+
   public enum State {
     case initial(URL?)
     case generating
@@ -31,7 +39,7 @@ public final class ClipMakerViewModel {
   public var didFinishMakingVideo: ((Result<URL, Error>) -> Void)?
   public var didSaveVideo: (() -> Void)?
   public var didFailToSaveVideo: (() -> Void)?
-  public var didFinishFlow: (() -> Void)?
+  public var didFinishFlow: ((_ targetAction: TargetAction?) -> Void)?
   public var didStartSharing: (() -> Void)?
   public var didShare: (() -> Void)?
 
@@ -56,6 +64,8 @@ public final class ClipMakerViewModel {
 
   private let shouldStartRightAway: Bool
   private let saveIntermediateVideos: Bool
+
+  private var cancelled: Bool = false
 
   // MARK: - Initializers
   public init(dataContext: ClipMakerContext, startRightAway: Bool, saveIntermediateVideos: Bool) {
@@ -154,11 +164,10 @@ public final class ClipMakerViewModel {
     }
   }
 
-  private var cancelled: Bool = false
   public func close() {
     NSLog("\(self):: cancel(), will delete video if needed")
     self.cancelled = true
-    self.didFinishFlow?()
+    self.finalize(targetAction: nil)
 
     guard case State.generated(let url) = self.state else {
       return
@@ -172,10 +181,14 @@ public final class ClipMakerViewModel {
     guard case State.generated(let url) = self.state else {
       return
     }
+
     self.state = .saving
     PHPhotoLibrary.shared().performChanges({
       PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
-    }) { saved, error in
+    }) { [weak self] saved, error in
+      guard let self = self else {
+        return
+      }
       if let error = error {
         self.didFailToSaveVideo?()
         self.state = .failed(error)
@@ -183,6 +196,7 @@ public final class ClipMakerViewModel {
         self.didSaveVideo?()
         self.state = .saved
       }
+      self.finalize(targetAction: .save)
     }
   }
 
@@ -194,8 +208,8 @@ public final class ClipMakerViewModel {
     let sharingVC = UIActivityViewController(activityItems: [url], applicationActivities: [])
 
     sharingVC.completionWithItemsHandler = { [weak self] _,_,_,_ in
-      self?.didFinishFlow?()
       self?.didShare?()
+      self?.finalize(targetAction: .share)
     }
 
     viewContext.present(sharingVC, animated: true, completion: nil)
@@ -223,5 +237,10 @@ public final class ClipMakerViewModel {
     } catch {
       NSLog("\(error)")
     }
+  }
+
+  private func finalize(targetAction: TargetAction?) {
+    self.didFinishFlow?(targetAction)
+    self.output?.stop()
   }
 }

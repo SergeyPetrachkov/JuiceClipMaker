@@ -255,6 +255,14 @@ private extension ClipMakerController {
 }
 
 extension ClipMakerController: ClipMakerViewModelOutput {
+  public func stop() {
+    DispatchQueue.main.async {
+      self.player?.pause()
+      self.layer?.removeFromSuperlayer()
+      self.player = nil
+    }
+  }
+
   public func didChangeState(_ state: ClipMakerViewModel.State) {
     DispatchQueue.main.async {
       switch state {
